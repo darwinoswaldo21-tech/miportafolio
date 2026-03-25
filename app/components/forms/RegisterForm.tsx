@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Input } from '@/app/components/ui/Input'
 import { Button } from '@/app/components/ui/Button'
 import { Card, CardContent, CardHeader } from '@/app/components/ui/Card'
-import { supabase } from '@/lib/supabase'
 
 export function RegisterForm() {
   const [email, setEmail] = useState('')
@@ -20,6 +19,20 @@ export function RegisterForm() {
     setSuccess('')
 
     try {
+      // Verificar variables de entorno
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      console.log('Supabase URL:', supabaseUrl)
+      console.log('Supabase Key:', supabaseKey ? 'Present' : 'Missing')
+      
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Variables de entorno de Supabase no configuradas')
+      }
+
+      // Importar dinámicamente Supabase
+      const { supabase } = await import('@/lib/supabase')
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -39,6 +52,7 @@ export function RegisterForm() {
         }, 3000)
       }
     } catch (err: any) {
+      console.error('Error en registro:', err)
       setError(err.message || 'Error al crear usuario')
     } finally {
       setLoading(false)
