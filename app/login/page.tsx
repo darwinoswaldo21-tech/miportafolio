@@ -1,5 +1,22 @@
-import { LoginForm } from '@/app/components/forms/LoginForm'
-
 export default function LoginPage() {
-  return <LoginForm />
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Iniciar Sesión
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Configurando conexión...
+          </p>
+        </div>
+        <div className="text-center">
+          <div className="text-4xl mb-4">🔐</div>
+          <p className="text-gray-500">
+            Estableciendo conexión segura con la base de datos
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }

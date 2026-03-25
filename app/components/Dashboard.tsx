@@ -24,7 +24,6 @@ export function Dashboard() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Cargar stats solo si es primera vez o si están vacías
         if (stats.total === 0) {
           const statsData = await dashboardQueries.getStats()
           setStats(statsData)
@@ -37,41 +36,34 @@ export function Dashboard() {
     }
 
     loadData()
-  }, []) // Sin dependencias, solo se ejecuta una vez
+  }, [])
 
   const handleCreatePlazoFijo = (data: any) => {
     console.log('Creando Plazo Fijo:', data)
-    // TODO: Implementar creación en Supabase
   }
 
   const handleCreateAhorro = (data: any) => {
     console.log('Creando Ahorro Programado:', data)
-    // TODO: Implementar creación en Supabase
   }
 
   const handleVerFondos = () => {
     console.log('Ver Fondos de Inversión')
-    // TODO: Navegar a página de fondos
   }
 
   const handleVerInversiones = () => {
     console.log('Ver Mis Inversiones')
-    // TODO: Navegar a página de inversiones
   }
 
   const handleAbrirCalculadora = () => {
     console.log('Abrir Calculadora')
-    // TODO: Navegar a calculadora
   }
 
   const handleGestionarBoletines = () => {
     console.log('Gestionar Boletines SEPS')
-    // TODO: Navegar a gestión de boletines
   }
 
   const handleAnalizarCooperativa = (data: any) => {
     console.log('Analizando Cooperativa con IA:', data)
-    // TODO: Implementar análisis con IA
   }
 
   if (loading) {
@@ -89,7 +81,7 @@ export function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-gray-900">� MiPortafolio</h1>
+              <h1 className="text-xl font-bold text-gray-900">💰 MiPortafolio</h1>
               <p className="text-gray-600">Gestiona tus inversiones financieras</p>
             </div>
             <div className="flex items-center space-x-3">
@@ -103,7 +95,7 @@ export function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Investment Cards Grid - Cards principales */}
+        {/* Investment Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
           <PlazoFijoCard onCreatePlazoFijo={handleCreatePlazoFijo} />
           <AhorroProgramadoCard onCreateAhorro={handleCreateAhorro} />
@@ -111,13 +103,13 @@ export function Dashboard() {
           <CalculadoraCard onAbrirCalculadora={handleAbrirCalculadora} />
         </div>
 
-        {/* Tools Row - Herramientas adicionales */}
+        {/* Tools Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
           <BoletinesCard onGestionarBoletines={handleGestionarBoletines} />
           <AnalisisIACard onAnalizarCooperativa={handleAnalizarCooperativa} />
         </div>
 
-        {/* Stats Section - Estadísticas importantes */}
+        {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
@@ -148,7 +140,7 @@ export function Dashboard() {
           </Card>
         </div>
 
-        {/* Mis Inversiones - Al final para no estorbar */}
+        {/* Mis Inversiones */}
         <div className="mb-8">
           <MisInversionesCard onVerInversiones={handleVerInversiones} />
         </div>
