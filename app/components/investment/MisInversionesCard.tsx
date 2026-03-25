@@ -102,74 +102,24 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
           ))}
         </div>
 
-        {/* Lista de inversiones reales */}
-        {inversiones.length > 0 ? (
-          <div className="space-y-3">
-            {inversiones.map((inversion) => (
-              <div key={inversion.id} className="border p-3 rounded-lg">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{inversion.nombre}</h4>
-                    <p className="text-sm text-gray-600">{inversion.entidad}</p>
-                    <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
-                      <span className="text-gray-500">Tipo: {inversion.tipo}</span>
-                      <span className="text-gray-500">Capital: ${parseFloat(inversion.capital).toLocaleString()}</span>
-                      <span className="text-gray-500">Tasa: {inversion.tasa_interes}%</span>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        inversion.estado === 'Activa' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {inversion.estado}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-green-600">
-                      ${parseFloat(inversion.capital).toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(inversion.creado_en).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          /* Mensaje de acción */
-          <div className="text-center">
-            <div className="text-4xl mb-3">📊</div>
-            <h4 className="text-lg font-medium text-gray-900 mb-2">
-              Aún no tienes inversiones
-            </h4>
-            <p className="text-gray-600 mb-4">
-              Crea tu primera inversión para comenzar a gestionar tu portafolio
-            </p>
-            <Button 
-              variant="primary" 
-              size="lg"
-              onClick={() => window.location.href = '/'}
-              className="px-8"
-            >
-              Crear mi primera inversión
-            </Button>
-          </div>
-        )}
-        
-        {/* Botón adicional más visible */}
-        {inversiones.length > 0 && (
-          <div className="mt-4 pt-4 border-t">
-            <Button 
-              variant="primary" 
-              size="lg"
-              onClick={() => window.location.href = '/inversiones'}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3"
-            >
-              📋 Ver Todas Mis Inversiones ({inversiones.length})
-            </Button>
-          </div>
-        )}
+        {/* Mensaje de acción - siempre visible */}
+        <div className="text-center">
+          <div className="text-4xl mb-3">📊</div>
+          <h4 className="text-lg font-medium text-gray-900 mb-2">
+            Gestiona todas tus inversiones
+          </h4>
+          <p className="text-gray-600 mb-4">
+            Consulta detalles, estados y fechas de vencimiento
+          </p>
+          <Button 
+            variant="primary" 
+            size="lg"
+            onClick={() => window.location.href = '/inversiones'}
+            className="px-8 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+          >
+            📋 Ver Todas Mis Inversiones ({inversiones.length})
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )
