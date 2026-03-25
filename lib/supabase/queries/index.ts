@@ -1,0 +1,5 @@
+export { entidadesQueries } from './entidades'
+export { fiduciariasQueries } from './fiduciarias'
+export { dashboardQueries } from './dashboard'
+export { entidadesSearchQueries } from './entidades-search'
+export { inversionesQueries } from './inversiones'
