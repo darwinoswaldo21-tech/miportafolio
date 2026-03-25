@@ -81,8 +81,13 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
       <CardHeader>
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold">💼 Mis Inversiones</h3>
-          <Button variant="primary" size="sm" onClick={() => window.location.href = '/inversiones'}>
-            Ver todas
+          <Button 
+            variant="primary" 
+            size="sm" 
+            onClick={() => window.location.href = '/inversiones'}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
+          >
+            📋 Ver Todas
           </Button>
         </div>
       </CardHeader>
@@ -148,6 +153,20 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
               className="px-8"
             >
               Crear mi primera inversión
+            </Button>
+          </div>
+        )}
+        
+        {/* Botón adicional más visible */}
+        {inversiones.length > 0 && (
+          <div className="mt-4 pt-4 border-t">
+            <Button 
+              variant="primary" 
+              size="lg"
+              onClick={() => window.location.href = '/inversiones'}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3"
+            >
+              📋 Ver Todas Mis Inversiones ({inversiones.length})
             </Button>
           </div>
         )}
