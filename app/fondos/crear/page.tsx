@@ -175,7 +175,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="text"
                           value={formData.nombre}
-                          onChange={(e) => setFormData({...formData, nombre: (e.target as HTMLInputElement).value})}
+                          onChange={(value) => setFormData({...formData, nombre: value})}
                           placeholder="Fondo Crecimiento 2026"
                           className={errores.nombre ? 'border-red-500' : ''}
                         />
@@ -189,7 +189,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="text"
                           value={formData.plazo_dias ? formData.plazo_dias.toString() : ''}
-                          onChange={(e) => setFormData({...formData, plazo_dias: parseInt((e.target as HTMLInputElement).value) || 0})}
+                          onChange={(value) => setFormData({...formData, plazo_dias: parseInt(value) || 0})}
                           placeholder="360"
                           className={errores.plazo_dias ? 'border-red-500' : ''}
                         />
@@ -207,7 +207,7 @@ export default function CrearFondoPage() {
                         ) : (
                           <select
                             value={formData.administradora}
-                            onChange={(e) => setFormData({...formData, administradora: (e.target as HTMLSelectElement).value})}
+                            onChange={(e) => setFormData({...formData, administradora: e.target.value})}
                             className={`w-full p-2 border rounded-md ${errores.administradora ? 'border-red-500' : 'border-gray-300'}`}
                           >
                             <option value="">Seleccione una fiduciaria...</option>
@@ -238,7 +238,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="text"
                           value={formData.valor_liquidativo ? formData.valor_liquidativo.toString() : ''}
-                          onChange={(e) => setFormData({...formData, valor_liquidativo: parseFloat((e.target as HTMLInputElement).value) || 0})}
+                          onChange={(value) => setFormData({...formData, valor_liquidativo: parseFloat(value) || 0})}
                           placeholder="100.00"
                           className={errores.valor_liquidativo ? 'border-red-500' : ''}
                         />
@@ -252,7 +252,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="text"
                           value={formData.rentabilidad ? formData.rentabilidad.toString() : ''}
-                          onChange={(e) => setFormData({...formData, rentabilidad: parseFloat((e.target as HTMLInputElement).value) || 0})}
+                          onChange={(value) => setFormData({...formData, rentabilidad: parseFloat(value) || 0})}
                           placeholder="8.5"
                           className={errores.rentabilidad ? 'border-red-500' : ''}
                         />
@@ -266,7 +266,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="text"
                           value={formData.aporte_mensual ? formData.aporte_mensual.toString() : ''}
-                          onChange={(e) => setFormData({...formData, aporte_mensual: parseFloat((e.target as HTMLInputElement).value) || 0})}
+                          onChange={(value) => setFormData({...formData, aporte_mensual: parseFloat(value) || 0})}
                           placeholder="500.00"
                         />
                         {errores.aporte_mensual && <p className="text-red-500 text-xs mt-1">{errores.aporte_mensual}</p>}
@@ -288,7 +288,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="date"
                           value={formData.fecha_inicio}
-                          onChange={(e) => setFormData({...formData, fecha_inicio: (e.target as HTMLInputElement).value})}
+                          onChange={(value) => setFormData({...formData, fecha_inicio: value})}
                           className={errores.fecha_inicio ? 'border-red-500' : ''}
                         />
                         {errores.fecha_inicio && <p className="text-red-500 text-xs mt-1">{errores.fecha_inicio}</p>}
@@ -301,7 +301,7 @@ export default function CrearFondoPage() {
                         <Input
                           type="date"
                           value={formData.fecha_vencimiento}
-                          onChange={(e) => setFormData({...formData, fecha_vencimiento: (e.target as HTMLInputElement).value})}
+                          onChange={(value) => setFormData({...formData, fecha_vencimiento: value})}
                           className={errores.fecha_vencimiento ? 'border-red-500' : ''}
                         />
                         {errores.fecha_vencimiento && <p className="text-red-500 text-xs mt-1">{errores.fecha_vencimiento}</p>}
@@ -316,7 +316,7 @@ export default function CrearFondoPage() {
                         </label>
                         <select
                           value={formData.estado}
-                          onChange={(e) => setFormData({...formData, estado: (e.target as HTMLSelectElement).value})}
+                          onChange={(e) => setFormData({...formData, estado: e.target.value})}
                           className="w-full p-2 border rounded-md border-gray-300"
                         >
                           <option value="Activo">✅ Activo</option>
@@ -338,7 +338,7 @@ export default function CrearFondoPage() {
                   </label>
                   <textarea
                     value={formData.notas}
-                    onChange={(e) => setFormData({...formData, notas: (e.target as HTMLTextAreaElement).value})}
+                    onChange={(e) => setFormData({...formData, notas: e.target.value})}
                     placeholder="Información adicional, estrategia, observaciones sobre el fondo..."
                     rows={3}
                     className="w-full p-2 border rounded-md border-gray-300"
