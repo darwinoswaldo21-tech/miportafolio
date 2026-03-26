@@ -37,10 +37,14 @@ interface FondoDetalleModalProps {
 
 export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   const [editando, setEditando] = useState(false)
-  const [mesActual, setMesActual] = useState('Febrero 2026')
+  const [mesSeleccionado, setMesSeleccionado] = useState('Marzo 2026')
+  const [imagenSubida, setImagenSubida] = useState<File | null>(null)
+  const [procesando, setProcesando] = useState(false)
+  const [datosIa, setDatosIa] = useState<Partial<DatosMensualesFondo> | null>(null)
+  
   const [datosMensuales, setDatosMensuales] = useState<DatosMensualesFondo>({
     fondo_id: fondo.id,
-    mes: 'Febrero 2026',
+    mes: 'Marzo 2026',
     unidades_participacion: fondo.unidades || 226.92760352,
     valor_unidad: fondo.valor_unidad_base || 1.34906548,
     valor_total_mes: 306.22,
@@ -49,22 +53,88 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     notas: ''
   })
 
+  // Generar lista de meses desde la fecha de inicio
+  const generarMeses = () => {
+    const meses = []
+    const fechaInicio = new Date(fondo.creado_en)
+    const fechaActual = new Date()
+    
+    let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
+    
+    while (currentDate <= fechaActual) {
+      const nombreMes = currentDate.toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long' 
+      })
+      meses.push(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+      currentDate.setMonth(currentDate.getMonth() + 1)
+    }
+    
+    return meses.reverse() // Mes más reciente primero
+  }
+
+  const mesesDisponibles = generarMeses()
+
   // Calcular valor total automáticamente
   const calcularValorTotal = () => {
     return datosMensuales.unidades_participacion * datosMensuales.valor_unidad
   }
 
-  // Calcular tasa efectiva basada en el valor
-  const calcularTasaEfectiva = () => {
-    // Lógica para calcular tasa basada en el rendimiento del mes
-    const valorBase = fondo.valor_liquidativo || 100
-    const rendimiento = (datosMensuales.valor_total_mes - valorBase) / valorBase * 100
-    return Math.round(rendimiento * 100) / 100
+  // Manejar subida de imagen
+  const handleImagenSubida = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setImagenSubida(file)
+    }
+  }
+
+  // Procesar imagen con IA
+  const procesarConIa = async () => {
+    if (!imagenSubida) return
+    
+    setProcesando(true)
+    try {
+      const formData = new FormData()
+      formData.append('imagen', imagenSubida)
+      formData.append('fondo_id', fondo.id.toString())
+      
+      const response = await fetch('/api/procesar-imagen-fondo', {
+        method: 'POST',
+        body: formData
+      })
+      
+      if (response.ok) {
+        const resultado = await response.json()
+        if (resultado.success) {
+          setDatosIa(resultado.datos)
+          // Actualizar formulario con datos de IA
+          setDatosMensuales({
+            ...datosMensuales,
+            ...resultado.datos
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error procesando imagen:', error)
+    } finally {
+      setProcesando(false)
+    }
+  }
+
+  // Cambiar mes seleccionado
+  const cambiarMes = (mes: string) => {
+    setMesSeleccionado(mes)
+    setDatosMensuales({
+      ...datosMensuales,
+      mes: mes
+    })
+    setDatosIa(null) // Limpiar datos de IA al cambiar mes
+    setImagenSubida(null) // Limpiar imagen al cambiar mes
   }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <h3 className="text-xl font-bold mb-4">💰 Detalles del Fondo</h3>
           
@@ -74,118 +144,179 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
               <p className="text-gray-600">{fondo.gestora_nombre}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mes
-                </label>
-                {editando ? (
-                  <input
-                    type="text"
-                    value={datosMensuales.mes}
-                    onChange={(e) => setDatosMensuales({...datosMensuales, mes: e.target.value})}
-                    className="w-full p-2 border rounded"
-                    placeholder="Febrero 2026"
-                  />
-                ) : (
-                  <div className="text-lg font-semibold text-blue-600">
-                    {datosMensuales.mes}
+            {/* Selector de Mes */}
+            <div className="bg-blue-50 p-4 rounded">
+              <h4 className="font-semibold mb-2">📅 Seleccionar Mes a Editar</h4>
+              <select 
+                value={mesSeleccionado}
+                onChange={(e) => cambiarMes(e.target.value)}
+                className="w-full p-2 border rounded"
+              >
+                {mesesDisponibles.map(mes => (
+                  <option key={mes} value={mes}>{mes}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Subida de Imagen */}
+            <div className="bg-green-50 p-4 rounded">
+              <h4 className="font-semibold mb-2">📷 Subir Estado de Cuenta (Opcional)</h4>
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={handleImagenSubida}
+                  className="w-full p-2 border rounded"
+                />
+                {imagenSubida && (
+                  <div className="text-sm text-gray-600">
+                    📁 Archivo: {imagenSubida.name}
                   </div>
                 )}
+                <Button 
+                  onClick={procesarConIa}
+                  disabled={!imagenSubida || procesando}
+                  className="w-full"
+                >
+                  {procesando ? '🤖 Procesando con IA...' : '🤖 Procesar con IA'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Resultados de IA */}
+            {datosIa && (
+              <div className="bg-yellow-50 p-4 rounded">
+                <h4 className="font-semibold mb-2">🤖 Datos Extraídos por IA</h4>
+                <div className="text-sm space-y-1">
+                  <div>✅ Unidades detectadas: {datosIa.unidades_participacion}</div>
+                  <div>✅ Valor unidad: ${datosIa.valor_unidad}</div>
+                  <div>✅ Tasa efectiva: {datosIa.tasa_efectiva_mes}%</div>
+                  <div>✅ Total mes: ${datosIa.valor_total_mes}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Formulario de Edición */}
+            <div className="border-t pt-4">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="font-semibold">✏️ Editar Datos del Mes: {mesSeleccionado}</h4>
+                <Button 
+                  variant="outline"
+                  onClick={() => setEditando(!editando)}
+                >
+                  {editando ? 'Cancelar Edición' : '✏️ Editar'}
+                </Button>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Unidades de Participación
-                </label>
-                {editando ? (
-                  <input
-                    type="number"
-                    step="0.000001"
-                    value={datosMensuales.unidades_participacion}
-                    onChange={(e) => setDatosMensuales({
-                      ...datosMensuales, 
-                      unidades_participacion: parseFloat(e.target.value),
-                      valor_total_mes: parseFloat(e.target.value) * datosMensuales.valor_unidad
-                    })}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <div className="text-lg font-semibold text-purple-600">
-                    {datosMensuales.unidades_participacion.toFixed(8)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Unidades de Participación
+                  </label>
+                  {editando ? (
+                    <input
+                      type="number"
+                      step="0.000001"
+                      value={datosMensuales.unidades_participacion}
+                      onChange={(e) => setDatosMensuales({
+                        ...datosMensuales, 
+                        unidades_participacion: parseFloat(e.target.value),
+                        valor_total_mes: parseFloat(e.target.value) * datosMensuales.valor_unidad
+                      })}
+                      className="w-full p-2 border rounded"
+                    />
+                  ) : (
+                    <div className="text-lg font-semibold text-purple-600">
+                      {datosMensuales.unidades_participacion.toFixed(8)}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Valor por Unidad
+                  </label>
+                  {editando ? (
+                    <input
+                      type="number"
+                      step="0.000001"
+                      value={datosMensuales.valor_unidad}
+                      onChange={(e) => setDatosMensuales({
+                        ...datosMensuales, 
+                        valor_unidad: parseFloat(e.target.value),
+                        valor_total_mes: datosMensuales.unidades_participacion * parseFloat(e.target.value)
+                      })}
+                      className="w-full p-2 border rounded"
+                    />
+                  ) : (
+                    <div className="text-lg font-semibold text-green-600">
+                      ${datosMensuales.valor_unidad.toFixed(8)}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Valor Total del Mes
+                  </label>
+                  <div className="text-lg font-bold text-blue-700">
+                    ${calcularValorTotal().toFixed(2)}
                   </div>
-                )}
-              </div>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Valor por Unidad
-                </label>
-                {editando ? (
-                  <input
-                    type="number"
-                    step="0.000001"
-                    value={datosMensuales.valor_unidad}
-                    onChange={(e) => setDatosMensuales({
-                      ...datosMensuales, 
-                      valor_unidad: parseFloat(e.target.value),
-                      valor_total_mes: datosMensuales.unidades_participacion * parseFloat(e.target.value)
-                    })}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <div className="text-lg font-semibold text-green-600">
-                    ${datosMensuales.valor_unidad.toFixed(8)}
-                  </div>
-                )}
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tasa Efectiva del Mes (%)
+                  </label>
+                  {editando ? (
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={datosMensuales.tasa_efectiva_mes}
+                      onChange={(e) => setDatosMensuales({...datosMensuales, tasa_efectiva_mes: parseFloat(e.target.value)})}
+                      className="w-full p-2 border rounded"
+                    />
+                  ) : (
+                    <div className="text-lg font-semibold text-orange-600">
+                      {datosMensuales.tasa_efectiva_mes}%
+                    </div>
+                  )}
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Valor Total del Mes
-                </label>
-                <div className="text-lg font-bold text-blue-700">
-                  ${calcularValorTotal().toFixed(2)}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Aporte Mensual
+                  </label>
+                  {editando ? (
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={datosMensuales.aporte_mensual}
+                      onChange={(e) => setDatosMensuales({...datosMensuales, aporte_mensual: parseFloat(e.target.value)})}
+                      className="w-full p-2 border rounded"
+                    />
+                  ) : (
+                    <div className="text-lg font-semibold text-purple-600">
+                      ${datosMensuales.aporte_mensual.toLocaleString()}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tasa Efectiva del Mes (%)
-                </label>
-                {editando ? (
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={datosMensuales.tasa_efectiva_mes}
-                    onChange={(e) => setDatosMensuales({...datosMensuales, tasa_efectiva_mes: parseFloat(e.target.value)})}
+              {editando && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Notas del mes
+                  </label>
+                  <textarea
+                    value={datosMensuales.notas}
+                    onChange={(e) => setDatosMensuales({...datosMensuales, notas: e.target.value})}
                     className="w-full p-2 border rounded"
+                    rows={3}
+                    placeholder="Notas sobre el rendimiento del mes..."
                   />
-                ) : (
-                  <div className="text-lg font-semibold text-orange-600">
-                    {datosMensuales.tasa_efectiva_mes}%
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Aporte Mensual
-                </label>
-                {editando ? (
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={datosMensuales.aporte_mensual}
-                    onChange={(e) => setDatosMensuales({...datosMensuales, aporte_mensual: parseFloat(e.target.value)})}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <div className="text-lg font-semibold text-purple-600">
-                    ${datosMensuales.aporte_mensual.toLocaleString()}
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="bg-gray-50 p-4 rounded">
@@ -217,21 +348,6 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                 </div>
               </div>
             </div>
-
-            {editando && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notas del mes
-                </label>
-                <textarea
-                  value={datosMensuales.notas}
-                  onChange={(e) => setDatosMensuales({...datosMensuales, notas: e.target.value})}
-                  className="w-full p-2 border rounded"
-                  rows={3}
-                  placeholder="Notas sobre el rendimiento del mes..."
-                />
-              </div>
-            )}
 
             <div className="flex justify-between pt-4">
               <Button variant="outline" onClick={onClose}>
