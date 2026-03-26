@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/app/components/ui/Card'
 import { Button } from '@/app/components/ui/Button'
 import { inversionesQueries } from '@/lib/supabase/queries'
 import { useAuth } from '@/app/hooks/useAuth'
+import { FondoDetalleModal } from '@/app/inversiones/FondoDetalleModal'
 
 interface Inversion {
   id: number
@@ -46,6 +47,7 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
   const [fondos, setFondos] = useState<FondoInversion[]>([])
   const [todasLasInversiones, setTodasLasInversiones] = useState<TodasLasInversiones[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedInversion, setSelectedInversion] = useState<FondoInversion | null>(null)
 
   const esFondoInversion = (inversion: TodasLasInversiones): inversion is FondoInversion => {
     return 'valor_liquidativo' in inversion
@@ -162,6 +164,32 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
           ))}
         </div>
 
+        {/* Lista de Fondos de Inversión con botones de detalles */}
+        <div className="space-y-3 mb-6">
+          <h4 className="text-lg font-semibold text-gray-900 mb-3">💰 Fondos de Inversión</h4>
+          {todasLasInversiones.filter(esFondoInversion).map((fondo) => (
+            <div key={fondo.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <div className="font-medium text-gray-900">{fondo.nombre}</div>
+                <div className="text-sm text-gray-600">{fondo.gestora_nombre}</div>
+                <div className="text-sm font-semibold text-green-600">
+                  ${fondo.valor_liquidativo.toLocaleString()}
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  // Abrir modal de detalles del fondo
+                  setSelectedInversion(fondo)
+                }}
+              >
+                📋 Detalles
+              </Button>
+            </div>
+          ))}
+        </div>
+
         {/* Mensaje de acción - siempre visible */}
         <div className="text-center">
           <div className="text-4xl mb-3">📊</div>
@@ -182,5 +210,13 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
         </div>
       </CardContent>
     </Card>
+
+    {/* Modal de detalles del fondo */}
+    {selectedInversion && (
+      <FondoDetalleModal 
+        fondo={selectedInversion} 
+        onClose={() => setSelectedInversion(null)} 
+      />
+    )}
   )
 }
