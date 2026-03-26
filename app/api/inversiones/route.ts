@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       .select('*')
       .order('creado_en', { ascending: false })
 
-    console.log('📊 Inversiones cargadas:', { count: data?.length || 0, error })
+    console.log('📊 Resultado de la consulta:', { data, error })
 
     if (error) {
       console.error('❌ Error cargando inversiones:', error)
@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    console.log('✅ Inversiones cargadas exitosamente:', data?.length || 0)
 
     return NextResponse.json({
       success: true,
