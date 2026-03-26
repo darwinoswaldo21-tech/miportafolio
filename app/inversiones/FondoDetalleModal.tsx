@@ -224,12 +224,12 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       // SOLUCIÓN CLOUDINARY: Subir directamente a Cloudinary
       console.log('☁️ Importando Cloudinary en frontend...')
       
-      // Verificar variables de entorno de Cloudinary
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+      // TEMPORAL: Valores hardcodeados para probar
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'drous3rse'
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fondos_preset'
       
-      console.log('- CLOUDINARY_CLOUD_NAME:', cloudName ? '✅' : '❌')
-      console.log('- CLOUDINARY_UPLOAD_PRESET:', uploadPreset ? '✅' : '❌')
+      console.log('- CLOUDINARY_CLOUD_NAME:', cloudName, '(env:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, ')')
+      console.log('- CLOUDINARY_UPLOAD_PRESET:', uploadPreset, '(env:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET, ')')
       
       if (!cloudName || !uploadPreset) {
         throw new Error('Variables de entorno de Cloudinary no configuradas')
