@@ -23,43 +23,106 @@ interface Inversion {
   creado_en: string
 }
 
+interface FondoInversion {
+  id: number
+  user_id: number | null
+  nombre: string
+  gestora_id: number | null
+  gestora_nombre: string
+  plazo: number
+  valor_liquidativo: number
+  rentabilidad: number
+  aporte_mensual: number
+  fecha_inicio: string
+  fecha_vencimiento: string
+  estado: string
+  notas: string
+  creado_en: string
+  unidades: number
+  valor_unidad_base: number
+  fecha_base: string
+  es_fondo_unidades: boolean
+}
+
+type TodasLasInversiones = Inversion | FondoInversion
+
 export default function InversionesPage() {
   const { user } = useAuth()
   const [inversiones, setInversiones] = useState<Inversion[]>([])
+  const [fondos, setFondos] = useState<FondoInversion[]>([])
+  const [todasLasInversiones, setTodasLasInversiones] = useState<TodasLasInversiones[]>([])
   const [loading, setLoading] = useState(false)
-  const [selectedInversion, setSelectedInversion] = useState<Inversion | null>(null)
+  const [selectedInversion, setSelectedInversion] = useState<TodasLasInversiones | null>(null)
 
   useEffect(() => {
-    const loadInversiones = async () => {
-      if (!user?.id) return
-      
+    const loadTodasLasInversiones = async () => {
       setLoading(true)
       try {
-        const result = await inversionesQueries.getByUserId(user.id)
-        if (result.success && result.data) {
-          setInversiones(result.data)
+        let fondosData: any = null
+        let inversionesData: Inversion[] = []
+
+        // Cargar inversiones a plazo fijo
+        try {
+          const inversionesResult = await inversionesQueries.getByUserId(user?.id?.toString() || "1")
+          if (inversionesResult.success && inversionesResult.data) {
+            inversionesData = inversionesResult.data
+            setInversiones(inversionesData)
+          }
+        } catch (error) {
+          console.log('⚠️ No se pudieron cargar inversiones a plazo fijo')
         }
+
+        // Cargar fondos de inversión
+        try {
+          const fondosResponse = await fetch('/api/fondos')
+          if (fondosResponse.ok) {
+            fondosData = await fondosResponse.json()
+            setFondos(fondosData.data || [])
+          }
+        } catch (error) {
+          console.log('⚠️ No se pudieron cargar fondos de inversión')
+        }
+
+        // Combinar todas las inversiones
+        const combinadas = [
+          ...inversionesData,
+          ...(fondosData?.data || [])
+        ].sort((a, b) => new Date(b.creado_en).getTime() - new Date(a.creado_en).getTime())
+
+        setTodasLasInversiones(combinadas)
       } catch (error) {
-        console.error('Error cargando inversiones:', error)
+        console.error('Error cargando todas las inversiones:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    loadInversiones()
+    loadTodasLasInversiones()
   }, [user?.id])
 
-  const totalInvertido = inversiones.reduce((sum, inv) => sum + parseFloat(inv.capital), 0)
-  const totalActivas = inversiones.filter(inv => inv.estado === 'Activa').length
-  const totalFinalizadas = inversiones.filter(inv => inv.estado === 'Finalizada').length
-
-  const getTipoAbreviado = (tipo: string) => {
-    switch (tipo) {
-      case 'Plazo Fijo': return 'PFijo'
-      case 'Fondo de Inversión': return 'Fondo'
-      case 'Ahorro Programado': return 'Ahorro'
-      default: return tipo
+  // Calcular estadísticas combinadas
+  const totalInvertido = todasLasInversiones.reduce((sum, inv) => {
+    if ('capital' in inv) {
+      return sum + parseFloat(inv.capital)
+    } else if ('valor_liquidativo' in inv) {
+      return sum + inv.valor_liquidativo
     }
+    return sum
+  }, 0)
+  
+  const totalActivas = todasLasInversiones.filter(inv => inv.estado === 'Activo' || inv.estado === 'Activa').length
+  const totalFinalizadas = todasLasInversiones.filter(inv => inv.estado === 'Finalizada').length
+
+  const getTipoAbreviado = (inversion: TodasLasInversiones) => {
+    if ('capital' in inversion) {
+      return 'PFijo' // Es plazo fijo
+    } else {
+      return 'Fondo' // Es fondo de inversión
+    }
+  }
+
+  const esFondoInversion = (inversion: TodasLasInversiones): inversion is FondoInversion => {
+    return 'valor_liquidativo' in inversion
   }
 
   const getPeriodicidadAbreviada = (periodicidad: string) => {
@@ -175,26 +238,45 @@ export default function InversionesPage() {
                           </span>
                         </div>
                         
-                        <p className="text-sm text-gray-600 mb-3">{inversion.entidad}</p>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {esFondoInversion(inversion) ? inversion.gestora_nombre : inversion.entidad}
+                        </p>
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                           <div>
                             <span className="text-gray-500">Tipo:</span>
-                            <div className="font-medium">{getTipoAbreviado(inversion.tipo)}</div>
+                            <div className="font-medium">{getTipoAbreviado(inversion)}</div>
                           </div>
                           <div>
-                            <span className="text-gray-500">Capital:</span>
+                            <span className="text-gray-500">
+                              {esFondoInversion(inversion) ? 'Valor Liquidativo:' : 'Capital:'}
+                            </span>
                             <div className="font-medium text-green-600">
-                              ${parseFloat(inversion.capital).toLocaleString()}
+                              ${esFondoInversion(inversion) 
+                                ? inversion.valor_liquidativo.toLocaleString() 
+                                : parseFloat(inversion.capital).toLocaleString()
+                              }
                             </div>
                           </div>
                           <div>
-                            <span className="text-gray-500">Tasa:</span>
-                            <div className="font-medium">{inversion.tasa_interes}%</div>
+                            <span className="text-gray-500">
+                              {esFondoInversion(inversion) ? 'Rentabilidad:' : 'Tasa:'}
+                            </span>
+                            <div className="font-medium">
+                              {esFondoInversion(inversion) 
+                                ? `${inversion.rentabilidad}%` 
+                                : `${inversion.tasa_interes}%`
+                              }
+                            </div>
                           </div>
                           <div>
                             <span className="text-gray-500">Plazo:</span>
-                            <div className="font-medium">{inversion.plazo_dias} días</div>
+                            <div className="font-medium">
+                              {esFondoInversion(inversion) 
+                                ? `${inversion.plazo} días` 
+                                : `${inversion.plazo_dias} días`
+                              }
+                            </div>
                           </div>
                           <div>
                             <span className="text-gray-500">Periodicidad:</span>
@@ -261,10 +343,10 @@ export default function InversionesPage() {
         </Card>
       </main>
 
-      {/* Modal de detalles */}
-      {selectedInversion && (
+      {/* Modal de detalles - solo para plazo fijo */}
+      {selectedInversion && !esFondoInversion(selectedInversion) && (
         <InversionDetailModal 
-          inversion={selectedInversion} 
+          inversion={selectedInversion as Inversion} 
           onClose={() => setSelectedInversion(null)} 
         />
       )}
