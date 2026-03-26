@@ -90,8 +90,10 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     
     const meses = []
     
-    // FORZAR: Siempre usar una fecha de inicio válida
+    // FORZAR: Siempre usar una fecha de inicio válida para garantizar meses
     let fechaInicio: Date
+    
+    // Intentar usar la fecha real del fondo
     if (fondo.creado_en && fondo.creado_en !== null && fondo.creado_en !== undefined) {
       fechaInicio = new Date(fondo.creado_en)
       console.log('🔍 fechaInicio desde creado_en:', fechaInicio)
