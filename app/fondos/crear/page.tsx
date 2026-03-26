@@ -116,12 +116,15 @@ export default function CrearFondoPage() {
       // Preparar los datos para guardar
       const fondoData = {
         nombre: formData.nombre,
-        tipo: 'Personalizado',
         administradora: formData.administradora,
-        rentabilidad_anual: formData.rentabilidad,
-        riesgo: 'Medio', // Por defecto para fondos personalizados
+        plazo_dias: formData.plazo_dias,
+        valor_liquidativo: formData.valor_liquidativo,
+        rentabilidad: formData.rentabilidad,
+        aporte_mensual: formData.aporte_mensual,
+        fecha_inicio: formData.fecha_inicio,
+        fecha_vencimiento: formData.fecha_vencimiento,
         estado: formData.estado,
-        created_at: new Date().toISOString()
+        notas: formData.notas
       }
 
       console.log('📊 Datos a guardar:', fondoData)
