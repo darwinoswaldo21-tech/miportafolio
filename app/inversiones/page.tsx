@@ -421,7 +421,7 @@ export default function InversionesPage() {
                           </div>
                         </div>
 
-                        {/* Ganancias del Fondo */}
+                        {/* Ganancias del Fondo (DATOS REALES DE BD) */}
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
@@ -433,10 +433,15 @@ export default function InversionesPage() {
                               </div>
                               <div>
                                 <span className="text-gray-600 text-xs">📈 Ganancia/Pérdida:</span>
-                                <div className={`font-bold ${inversion.unidades * inversion.valor_liquidativo >= inversion.unidades * inversion.valor_unidad_base ? 'text-green-600' : 'text-red-600'}`}>
+                                <div className={`font-bold ${(() => {
+                                  const valorActual = inversion.unidades * inversion.valor_liquidativo
+                                  const valorInicial = inversion.valor_unidad_base * inversion.unidades
+                                  const ganancia = valorActual - valorInicial
+                                  return ganancia >= 0 ? 'text-green-600' : 'text-red-600'
+                                })()}`}>
                                   {(() => {
                                     const valorActual = inversion.unidades * inversion.valor_liquidativo
-                                    const valorInicial = inversion.unidades * inversion.valor_unidad_base
+                                    const valorInicial = inversion.valor_unidad_base * inversion.unidades
                                     const ganancia = valorActual - valorInicial
                                     return ganancia >= 0 ? `📈 +$${Math.abs(ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : `📉 -$${Math.abs(ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                                   })()}
@@ -446,18 +451,21 @@ export default function InversionesPage() {
                                 <span className="text-gray-600 text-xs">📊 Rendimiento:</span>
                                 <div className={`font-bold ${(() => {
                                   const valorActual = inversion.unidades * inversion.valor_liquidativo
-                                  const valorInicial = inversion.unidades * inversion.valor_unidad_base
+                                  const valorInicial = inversion.valor_unidad_base * inversion.unidades
                                   const porcentaje = valorInicial > 0 ? ((valorActual - valorInicial) / valorInicial) * 100 : 0
                                   return porcentaje >= 0 ? 'text-green-600' : 'text-red-600'
                                 })()}`}>
                                   {(() => {
                                     const valorActual = inversion.unidades * inversion.valor_liquidativo
-                                    const valorInicial = inversion.unidades * inversion.valor_unidad_base
+                                    const valorInicial = inversion.valor_unidad_base * inversion.unidades
                                     const porcentaje = valorInicial > 0 ? ((valorActual - valorInicial) / valorInicial) * 100 : 0
                                     return porcentaje >= 0 ? `📈 +${Math.abs(porcentaje).toFixed(2)}%` : `📉 -${Math.abs(porcentaje).toFixed(2)}%`
                                   })()}
                                 </div>
                               </div>
+                            </div>
+                            <div className="mt-2 text-xs text-gray-600 bg-white p-2 rounded">
+                              💡 Basado en tus datos reales: {inversion.unidades} unidades × ${inversion.valor_liquidativo.toLocaleString()} = ${(inversion.unidades * inversion.valor_liquidativo).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
                           </div>
                         </div>
