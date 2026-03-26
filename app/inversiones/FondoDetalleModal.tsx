@@ -136,15 +136,60 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     }
   }
 
-  // Cambiar mes seleccionado
-  const cambiarMes = (mes: string) => {
+  // Cambiar mes seleccionado y cargar datos existentes
+  const cambiarMes = async (mes: string) => {
     setMesSeleccionado(mes)
-    setDatosMensuales({
-      ...datosMensuales,
-      mes: mes
-    })
     setDatosIa(null) // Limpiar datos de IA al cambiar mes
     setImagenSubida(null) // Limpiar imagen al cambiar mes
+    
+    // Cargar datos existentes del mes
+    try {
+      const response = await fetch(`/api/subir-imagen-fondo?fondo_id=${fondo.id}&mes=${encodeURIComponent(mes)}`)
+      if (response.ok) {
+        const resultado = await response.json()
+        if (resultado.success && resultado.data && resultado.data.length > 0) {
+          const datosExistente = resultado.data[0] // Tomar el más reciente
+          
+          // Actualizar formulario con datos existentes
+          setDatosMensuales({
+            fondo_id: fondo.id,
+            mes: mes,
+            unidades_participacion: datosExistente.unidades_participacion || fondo.unidades || 226.92760352,
+            valor_unidad: datosExistente.valor_unidad || fondo.valor_unidad_base || 1.34906548,
+            valor_total_mes: datosExistente.valor_total_mes || 306.22,
+            tasa_efectiva_mes: datosExistente.tasa_efectiva_mes || fondo.rentabilidad,
+            aporte_mensual: datosExistente.aporte_mensual || fondo.aporte_mensual,
+            notas: datosExistente.notas || ''
+          })
+          
+          console.log('✅ Datos cargados del mes:', mes, datosExistente)
+          
+          // Mostrar imagen si existe
+          if (datosExistente.url_publica) {
+            // Simular que tenemos la imagen para mostrarla
+            setImagenSubida({
+              name: datosExistente.nombre_archivo,
+              size: datosExistente.tamaño_bytes,
+              type: `image/${datosExistente.tipo_archivo}`
+            } as any)
+          }
+        } else {
+          // Si no hay datos, usar valores por defecto
+          setDatosMensuales({
+            fondo_id: fondo.id,
+            mes: mes,
+            unidades_participacion: fondo.unidades || 226.92760352,
+            valor_unidad: fondo.valor_unidad_base || 1.34906548,
+            valor_total_mes: 306.22,
+            tasa_efectiva_mes: fondo.rentabilidad,
+            aporte_mensual: fondo.aporte_mensual,
+            notas: ''
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando datos del mes:', error)
+    }
   }
 
   return (
@@ -173,9 +218,33 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
               </select>
             </div>
 
+            {/* Imagen Existente del Mes */}
+            {imagenSubida && imagenSubida.name && (
+              <div className="bg-blue-50 p-4 rounded">
+                <h4 className="font-semibold mb-2">📷 Imagen del Mes: {mesSeleccionado}</h4>
+                <div className="text-sm space-y-1">
+                  <div>📁 Archivo existente: {imagenSubida.name}</div>
+                  <div>📊 Tamaño: {(imagenSubida.size / 1024 / 1024).toFixed(2)} MB</div>
+                  <div>🔗 Esta imagen ya está guardada en Supabase</div>
+                </div>
+                <div className="mt-2">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      // Aquí podrías añadir funcionalidad para ver/eliminar la imagen existente
+                      alert('🔗 Imagen guardada permanentemente en Supabase Storage')
+                    }}
+                    className="w-full"
+                  >
+                    👁 Ver Imagen Guardada
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Subida de Imagen */}
             <div className="bg-green-50 p-4 rounded">
-              <h4 className="font-semibold mb-2">📷 Subir Estado de Cuenta (Opcional)</h4>
+              <h4 className="font-semibold mb-2">📤 Subir Nueva Imagen (Opcional)</h4>
               <div className="space-y-2">
                 <input
                   type="file"
