@@ -6,6 +6,7 @@ import { Button } from '@/app/components/ui/Button'
 import { useAuth } from '@/app/hooks/useAuth'
 import { inversionesQueries } from '@/lib/supabase/queries'
 import { InversionDetailModal } from '@/app/components/investment/InversionDetailModal'
+import { FondoDetalleModal } from './FondoDetalleModal'
 
 interface Inversion {
   id: number
@@ -369,15 +370,13 @@ export default function InversionesPage() {
                         </div>
                       </div>
                       <div className="ml-4">
-                        {!esFondoInversion(inversion) && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setSelectedInversion(inversion)}
-                          >
-                            📋 Ver Detalles
-                          </Button>
-                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedInversion(inversion)}
+                        >
+                          📋 Ver Detalles
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -398,7 +397,13 @@ export default function InversionesPage() {
         </Card>
       </main>
 
-      {/* Modal de detalles - solo para plazo fijo */}
+      {/* Modal de detalles - usar el modal correcto según el tipo */}
+      {selectedInversion && esFondoInversion(selectedInversion) && (
+        <FondoDetalleModal 
+          fondo={selectedInversion} 
+          onClose={() => setSelectedInversion(null)} 
+        />
+      )}
       {selectedInversion && !esFondoInversion(selectedInversion) && (
         <InversionDetailModal 
           inversion={selectedInversion as Inversion} 
