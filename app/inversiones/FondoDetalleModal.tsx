@@ -207,81 +207,86 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     }
   }
 
-  // Subir imagen permanentemente a Supabase
+  // Subir imagen permanentemente a Cloudinary
   const subirImagenPermanente = async () => {
     if (!imagenSubida) {
       console.log('❌ No hay imagen seleccionada')
       return
     }
     
-    console.log('🚀 Iniciando subida DIRECTA desde frontend...')
+    console.log('🚀 Iniciando subida a CLOUDINARY...')
     console.log('- imagenSubida:', imagenSubida?.name)
     console.log('- fondo_id:', fondo.id)
     console.log('- mes:', mesSeleccionado)
     
     setProcesando(true)
     try {
-      // SOLUCIÓN DIRECTA: Usar Supabase desde el frontend
-      console.log('📦 Importando Supabase en frontend...')
+      // SOLUCIÓN CLOUDINARY: Subir directamente a Cloudinary
+      console.log('☁️ Importando Cloudinary en frontend...')
+      
+      // Verificar variables de entorno de Cloudinary
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+      
+      console.log('- CLOUDINARY_CLOUD_NAME:', cloudName ? '✅' : '❌')
+      console.log('- CLOUDINARY_UPLOAD_PRESET:', uploadPreset ? '✅' : '❌')
+      
+      if (!cloudName || !uploadPreset) {
+        throw new Error('Variables de entorno de Cloudinary no configuradas')
+      }
+      
+      // Convertir imagen a base64
+      console.log('📁 Convirtiendo imagen a base64...')
+      const bytes = await imagenSubida.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const base64 = buffer.toString('base64')
+      const dataUrl = `data:${imagenSubida.type};base64,${base64}`
+      
+      console.log('- tamaño base64:', dataUrl.length, 'caracteres')
+      
+      // Subir a Cloudinary
+      console.log('☁️ Subiendo a Cloudinary...')
+      const formData = new FormData()
+      formData.append('file', dataUrl)
+      formData.append('upload_preset', uploadPreset)
+      
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: 'POST',
+          body: formData
+        }
+      )
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Error de Cloudinary:', errorText)
+        throw new Error(`Error subiendo a Cloudinary: ${errorText}`)
+      }
+      
+      const cloudinaryData = await response.json()
+      console.log('✅ Imagen subida a Cloudinary:', cloudinaryData)
+      
+      // Guardar en base de datos (solo la URL de Cloudinary)
+      console.log('💾 Guardando URL de Cloudinary en base de datos...')
       const { createClient } = await import('@supabase/supabase-js')
       
-      // Verificar variables de entorno
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      
-      console.log('- SUPABASE_URL:', supabaseUrl ? '✅' : '❌')
-      console.log('- SUPABASE_ANON_KEY:', supabaseKey ? '✅' : '❌')
       
       if (!supabaseUrl || !supabaseKey) {
         throw new Error('Variables de entorno de Supabase no configuradas')
       }
       
-      // Crear cliente de Supabase
-      console.log('🔗 Creando cliente de Supabase...')
       const supabase = createClient(supabaseUrl, supabaseKey)
       
-      // Convertir imagen a buffer
-      console.log('📁 Convirtiendo imagen a buffer...')
-      const bytes = await imagenSubida.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const fileExt = imagenSubida.name.split('.').pop()?.toLowerCase() || 'jpg'
-      const fileName = `fondo-${fondo.id}-${mesSeleccionado.replace(/\s+/g, '-')}.${fileExt}`
-      
-      console.log('- fileName:', fileName)
-      console.log('- tamaño:', buffer.length, 'bytes')
-      
-      // Subir a Supabase Storage
-      console.log('📤 Subiendo a Supabase Storage...')
-      const { data, error } = await supabase.storage
-        .from('fondos-imagenes')
-        .upload(fileName, buffer, {
-          contentType: imagenSubida.type,
-          upsert: false
-        })
-      
-      if (error) {
-        console.error('❌ Error subiendo a Storage:', error)
-        throw new Error(`Error subiendo a Storage: ${error.message}`)
-      }
-      
-      console.log('✅ Imagen subida a Storage:', data)
-      
-      // Obtener URL pública
-      const { data: { publicUrl } } = supabase.storage
-        .from('fondos-imagenes')
-        .getPublicUrl(fileName)
-      
-      console.log('🔗 URL pública:', publicUrl)
-      
-      // Guardar en base de datos
-      console.log('💾 Guardando en base de datos...')
       const datosBD = {
         fondo_id: fondo.id,
         mes: mesSeleccionado,
         nombre_archivo: imagenSubida.name,
-        tipo_archivo: fileExt,
-        tamaño_bytes: buffer.length,
-        url_imagen: publicUrl,
+        tipo_archivo: imagenSubida.name.split('.').pop()?.toLowerCase() || 'jpg',
+        tamaño_bytes: imagenSubida.size,
+        url_imagen: cloudinaryData.secure_url, // URL de Cloudinary
         creado_en: new Date().toISOString()
       }
       
@@ -293,8 +298,6 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       
       if (dbError) {
         console.error('❌ Error guardando en BD:', dbError)
-        console.error('Código:', dbError.code)
-        console.error('Mensaje:', dbError.message)
         
         // MANEJO ESPECÍFICO PARA ERROR RLS
         if (dbError.message.includes('row-level security policy')) {
@@ -304,17 +307,17 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
         throw new Error(`Error guardando en BD: ${dbError.message}`)
       }
       
-      console.log('✅ Imagen guardada exitosamente en BD y Storage')
+      console.log('✅ URL de Cloudinary guardada exitosamente en BD')
       
       // Mostrar mensaje de éxito
-      alert(`✅ Imagen guardada exitosamente (DIRECTO):\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${buffer.length} bytes\n📅 Mes: ${mesSeleccionado}\n🔗 URL: ${publicUrl}`)
+      alert(`✅ Imagen guardada exitosamente (CLOUDINARY):\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${imagenSubida.size} bytes\n📅 Mes: ${mesSeleccionado}\n☁️ URL: ${cloudinaryData.secure_url}`)
       
       // Limpiar formulario
       setImagenSubida(null)
       setDatosIa(null)
       
     } catch (error) {
-      console.error('❌ Error en subida directa:', error)
+      console.error('❌ Error en subida a Cloudinary:', error)
       console.error('Tipo:', error instanceof Error ? error.constructor.name : 'Desconocido')
       console.error('Mensaje:', error instanceof Error ? error.message : 'Error desconocido')
       alert(`❌ Error subiendo imagen: ${error instanceof Error ? error.message : 'Error desconocido'}`)
