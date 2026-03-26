@@ -110,8 +110,13 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       })
       const mesFormateado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)
       meses.unshift(mesFormateado)
-      currentDate.setMonth(currentDate.getMonth() + 1)
-      console.log('🔍 Añadiendo mes:', mesFormateado)
+      console.log('🔍 Añadiendo mes:', mesFormateado, '- currentDate:', currentDate)
+      
+      // AVANZAR al siguiente mes CORRECTAMENTE
+      const nextMonth = new Date(currentDate)
+      nextMonth.setMonth(nextMonth.getMonth() + 1)
+      currentDate = nextMonth
+      
       contador++
     }
     
