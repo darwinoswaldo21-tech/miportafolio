@@ -193,8 +193,17 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   // Manejar subida de imagen
   const handleImagenSubida = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    console.log('📁 Imagen seleccionada:', file)
+    console.log('- nombre:', file?.name)
+    console.log('- tamaño:', file?.size)
+    console.log('- tipo:', file?.type)
+    
     if (file) {
       setImagenSubida(file)
+      console.log('✅ imagenSubida actualizada:', file.name)
+    } else {
+      console.log('❌ No se seleccionó ninguna imagen')
+      setImagenSubida(null)
     }
   }
 
@@ -405,6 +414,12 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                 >
                   {procesando ? '📤 Subiendo...' : '📤 Subir Imagen Permanentemente'}
                 </Button>
+                {/*
+                  DEBUG: Estado del botón
+                  - imagenSubida: {imagenSubida ? imagenSubida.name : 'null'}
+                  - procesando: {procesando ? 'true' : 'false'}
+                  - disabled: {!imagenSubida || procesando ? 'true' : 'false'}
+                */}
               </div>
             </div>
 
