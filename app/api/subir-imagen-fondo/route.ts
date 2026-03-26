@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('📤 Subiendo imagen a Supabase Storage...')
+    console.log('📤 INICIANDO SUBIDA DE IMAGEN...')
     
     const formData = await request.formData()
     const imagen = formData.get('imagen') as File
@@ -11,13 +11,25 @@ export async function POST(request: NextRequest) {
     const mes = formData.get('mes') as string
     const datosExtraidos = formData.get('datos_extraidos') as string
     
+    console.log('📊 Datos recibidos:')
+    console.log('- imagen:', imagen?.name, imagen?.size, imagen?.type)
+    console.log('- fondo_id:', fondo_id)
+    console.log('- mes:', mes)
+    console.log('- datos_extraidos:', datosExtraidos)
+    
     if (!imagen || !fondo_id || !mes) {
+      console.log('❌ Faltan datos requeridos')
       return NextResponse.json(
         { success: false, error: 'Faltan datos requeridos' },
         { status: 400 }
       )
     }
 
+    // Verificar variables de entorno
+    console.log('🔍 Variables de entorno:')
+    console.log('- SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅' : '❌')
+    console.log('- SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅' : '❌')
+    
     // Crear cliente de Supabase
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,12 +46,22 @@ export async function POST(request: NextRequest) {
     console.log('📊 Tamaño:', buffer.length, 'bytes')
     
     // Subir a Supabase Storage
+    console.log('📤 Subiendo a Supabase Storage...')
+    console.log('- bucket:', 'fondos-imagenes')
+    console.log('- fileName:', fileName)
+    console.log('- contentType:', imagen.type)
+    console.log('- bufferSize:', buffer.length)
+    
     const { data, error } = await supabase.storage
       .from('fondos-imagenes')
       .upload(fileName, buffer, {
         contentType: imagen.type,
         upsert: false
       })
+
+    console.log('📊 Resultado subida Storage:')
+    console.log('- data:', data)
+    console.log('- error:', error)
 
     if (error) {
       console.error('❌ Error subiendo a Storage:', error)
@@ -58,6 +80,14 @@ export async function POST(request: NextRequest) {
     console.log('🔗 URL pública:', publicUrl)
 
     // Guardar en base de datos
+    console.log('💾 Guardando en base de datos...')
+    console.log('- tabla:', 'fondo_imagenes')
+    console.log('- fondo_id:', parseInt(fondo_id))
+    console.log('- mes:', mes)
+    console.log('- nombre_archivo:', imagen.name)
+    console.log('- url_storage:', data.path)
+    console.log('- url_publica:', publicUrl)
+    
     const { error: dbError } = await supabase
       .from('fondo_imagenes')
       .insert({
@@ -73,6 +103,9 @@ export async function POST(request: NextRequest) {
         procesado: !!datosExtraidos,
         creado_en: new Date().toISOString()
       })
+
+    console.log('📊 Resultado guardado BD:')
+    console.log('- dbError:', dbError)
 
     if (dbError) {
       console.error('❌ Error guardando en BD:', dbError)
