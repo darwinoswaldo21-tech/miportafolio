@@ -117,6 +117,12 @@ export default function InversionesPage() {
 
   const fondosDeInversion = todasLasInversiones.filter(esFondoInversion)
   const plazosFijos = todasLasInversiones.filter(inv => !esFondoInversion(inv))
+  
+  // Depuración: mostrar qué se está cargando
+  console.log('🔍 Total inversiones combinadas:', todasLasInversiones.length)
+  console.log('🔍 Fondos de inversión:', fondosDeInversion.length)
+  console.log('🔍 Plazos fijos:', plazosFijos.length)
+  console.log('🔍 Lista de plazos fijos:', plazosFijos)
 
   // Calcular estadísticas combinadas
   const totalInvertido = todasLasInversiones.reduce((sum, inv) => {
