@@ -419,6 +419,47 @@ export default function InversionesPage() {
                             </div>
                           </div>
                         </div>
+
+                        {/* Ganancias del Fondo */}
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                              <div>
+                                <span className="text-gray-600 text-xs">💎 Valor Actual:</span>
+                                <div className="font-bold text-green-600">
+                                  ${(inversion.unidades * inversion.valor_liquidativo).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-gray-600 text-xs">📈 Ganancia/Pérdida:</span>
+                                <div className={`font-bold ${inversion.unidades * inversion.valor_liquidativo >= inversion.unidades * inversion.valor_unidad_base ? 'text-green-600' : 'text-red-600'}`}>
+                                  {(() => {
+                                    const valorActual = inversion.unidades * inversion.valor_liquidativo
+                                    const valorInicial = inversion.unidades * inversion.valor_unidad_base
+                                    const ganancia = valorActual - valorInicial
+                                    return ganancia >= 0 ? `📈 +$${Math.abs(ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : `📉 -$${Math.abs(ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                  })()}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-gray-600 text-xs">📊 Rendimiento:</span>
+                                <div className={`font-bold ${(() => {
+                                  const valorActual = inversion.unidades * inversion.valor_liquidativo
+                                  const valorInicial = inversion.unidades * inversion.valor_unidad_base
+                                  const porcentaje = valorInicial > 0 ? ((valorActual - valorInicial) / valorInicial) * 100 : 0
+                                  return porcentaje >= 0 ? 'text-green-600' : 'text-red-600'
+                                })()}`}>
+                                  {(() => {
+                                    const valorActual = inversion.unidades * inversion.valor_liquidativo
+                                    const valorInicial = inversion.unidades * inversion.valor_unidad_base
+                                    const porcentaje = valorInicial > 0 ? ((valorActual - valorInicial) / valorInicial) * 100 : 0
+                                    return porcentaje >= 0 ? `📈 +${Math.abs(porcentaje).toFixed(2)}%` : `📉 -${Math.abs(porcentaje).toFixed(2)}%`
+                                  })()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <div className="ml-4">
                         <Button 
