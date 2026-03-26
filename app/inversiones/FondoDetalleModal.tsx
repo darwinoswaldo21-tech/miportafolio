@@ -327,7 +327,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
 
             {/* Selector de Mes */}
             <div className="bg-blue-50 p-4 rounded">
-              <h4 className="font-semibold mb-2">📅 Seleccionar Mes a Editar</h4>
+              <h4 className="font-semibold mb-2">📅 Seleccione el mes a editar</h4>
               <select 
                 value={mesSeleccionado}
                 onChange={(e) => cambiarMes(e.target.value)}
