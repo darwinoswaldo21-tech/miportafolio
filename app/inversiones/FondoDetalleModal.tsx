@@ -214,41 +214,102 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       return
     }
     
-    console.log('🚀 Iniciando subida MANUAL...')
+    console.log('🚀 Iniciando subida DIRECTA desde frontend...')
     console.log('- imagenSubida:', imagenSubida?.name)
     console.log('- fondo_id:', fondo.id)
     console.log('- mes:', mesSeleccionado)
     
     setProcesando(true)
     try {
-      // SOLUCIÓN TEMPORAL: Crear registro manual sin API
-      const datosManuales = {
+      // SOLUCIÓN DIRECTA: Usar Supabase desde el frontend
+      console.log('📦 Importando Supabase en frontend...')
+      const { createClient } = await import('@supabase/supabase-js')
+      
+      // Verificar variables de entorno
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      console.log('- SUPABASE_URL:', supabaseUrl ? '✅' : '❌')
+      console.log('- SUPABASE_ANON_KEY:', supabaseKey ? '✅' : '❌')
+      
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Variables de entorno de Supabase no configuradas')
+      }
+      
+      // Crear cliente de Supabase
+      console.log('🔗 Creando cliente de Supabase...')
+      const supabase = createClient(supabaseUrl, supabaseKey)
+      
+      // Convertir imagen a buffer
+      console.log('📁 Convirtiendo imagen a buffer...')
+      const bytes = await imagenSubida.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const fileExt = imagenSubida.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const fileName = `fondo-${fondo.id}-${mesSeleccionado.replace(/\s+/g, '-')}.${fileExt}`
+      
+      console.log('- fileName:', fileName)
+      console.log('- tamaño:', buffer.length, 'bytes')
+      
+      // Subir a Supabase Storage
+      console.log('📤 Subiendo a Supabase Storage...')
+      const { data, error } = await supabase.storage
+        .from('fondos-imagenes')
+        .upload(fileName, buffer, {
+          contentType: imagenSubida.type,
+          upsert: false
+        })
+      
+      if (error) {
+        console.error('❌ Error subiendo a Storage:', error)
+        throw new Error(`Error subiendo a Storage: ${error.message}`)
+      }
+      
+      console.log('✅ Imagen subida a Storage:', data)
+      
+      // Obtener URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from('fondos-imagenes')
+        .getPublicUrl(fileName)
+      
+      console.log('🔗 URL pública:', publicUrl)
+      
+      // Guardar en base de datos
+      console.log('💾 Guardando en base de datos...')
+      const datosBD = {
         fondo_id: fondo.id,
         mes: mesSeleccionado,
         nombre_archivo: imagenSubida.name,
-        tipo_archivo: imagenSubida.name.split('.').pop()?.toLowerCase() || 'jpg',
-        tamaño_bytes: imagenSubida.size,
-        url_imagen: `https://manual-temporal.com/${imagenSubida.name}`,
+        tipo_archivo: fileExt,
+        tamaño_bytes: buffer.length,
+        url_imagen: publicUrl,
         creado_en: new Date().toISOString()
       }
       
-      console.log('� Creando registro manual:', datosManuales)
+      console.log('- datos a guardar:', datosBD)
       
-      // Simular guardado exitoso
-      console.log('✅ Registro manual creado exitosamente')
+      const { error: dbError } = await supabase
+        .from('fondo_imagenes')
+        .insert(datosBD)
+      
+      if (dbError) {
+        console.error('❌ Error guardando en BD:', dbError)
+        throw new Error(`Error guardando en BD: ${dbError.message}`)
+      }
+      
+      console.log('✅ Imagen guardada exitosamente en BD y Storage')
       
       // Mostrar mensaje de éxito
-      alert(`✅ Imagen guardada exitosamente (MODO MANUAL):\n📁 Archivo: ${imagenSubida.name}\n� Tamaño: ${imagenSubida.size} bytes\n📅 Mes: ${mesSeleccionado}\n💡 Nota: Modo temporal hasta arreglar API`)
+      alert(`✅ Imagen guardada exitosamente (DIRECTO):\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${buffer.length} bytes\n📅 Mes: ${mesSeleccionado}\n� URL: ${publicUrl}`)
       
       // Limpiar formulario
       setImagenSubida(null)
       setDatosIa(null)
       
     } catch (error) {
-      console.error('❌ Error en modo manual:', error)
+      console.error('❌ Error en subida directa:', error)
       console.error('Tipo:', error instanceof Error ? error.constructor.name : 'Desconocido')
       console.error('Mensaje:', error instanceof Error ? error.message : 'Error desconocido')
-      alert('❌ Error subiendo imagen. Intente nuevamente.')
+      alert(`❌ Error subiendo imagen: ${error instanceof Error ? error.message : 'Error desconocido'}`)
     } finally {
       setProcesando(false)
     }
