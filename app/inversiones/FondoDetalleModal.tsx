@@ -53,20 +53,17 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     notas: ''
   })
 
-  // Generar lista de meses desde el mes de inicio hasta el mes PASADO (no el actual)
+  // Generar lista de meses desde el mes de inicio hasta el mes ACTUAL (todos)
   const generarMeses = () => {
     const meses = []
     const fechaInicio = new Date(fondo.creado_en)
     const fechaActual = new Date()
     
-    // Calcular el mes pasado (el último mes completado)
-    const mesPasado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1)
-    
     // Empezar desde el mes exacto de inicio del fondo
     let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
     
-    // Generar meses hacia adelante hasta el mes PASADO (no el actual)
-    while (currentDate <= mesPasado) {
+    // Generar meses hacia adelante hasta el mes ACTUAL (todos los meses)
+    while (currentDate <= fechaActual) {
       const nombreMes = currentDate.toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long' 
@@ -75,7 +72,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       currentDate.setMonth(currentDate.getMonth() + 1)
     }
     
-    return meses.reverse() // Mes más reciente primero (el pasado)
+    return meses.reverse() // Mes más reciente primero
   }
 
   // Obtener información del mes actual
@@ -234,12 +231,8 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                   <span className="font-medium">🗓️ Mes Actual:</span>
                   <span className="text-orange-600 font-bold">{getMesActual()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">📊 Último Mes Completado:</span>
-                  <span className="text-green-600 font-bold">{getMesPasado()}</span>
-                </div>
                 <div className="text-xs text-gray-600 mt-2">
-                  💡 Puedes actualizar datos hasta {getMesPasado()}. {getMesActual()} aún no está completado.
+                  💡 Puedes actualizar datos de todos los meses desde {fondo.creado_en ? new Date(fondo.creado_en).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : 'el inicio'} hasta {getMesActual()}.
                 </div>
               </div>
             </div>
@@ -251,14 +244,14 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                 <Button 
                   variant="outline"
                   onClick={() => {
-                    alert(`🔄 Actualizar todos los meses desde ${fondo.creado_en ? new Date(fondo.creado_en).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : 'el inicio'} hasta ${getMesPasado()}`)
+                    alert(`🔄 Actualizar todos los meses desde ${fondo.creado_en ? new Date(fondo.creado_en).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : 'el inicio'} hasta ${getMesActual()}`)
                   }}
                   className="w-full"
                 >
                   🔄 Actualizar Todos los Meses
                 </Button>
                 <div className="text-xs text-gray-600">
-                  💡 Esta opción te permitirá editar datos de todos los meses desde el inicio hasta el último mes completado.
+                  💡 Esta opción te permitirá editar datos de todos los meses desde el inicio hasta el mes actual.
                 </div>
               </div>
             </div>
