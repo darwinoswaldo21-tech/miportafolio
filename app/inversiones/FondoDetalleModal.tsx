@@ -113,25 +113,6 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     return meses.reverse() // Mes más reciente primero
   }
 
-  // Obtener información del mes actual
-  const getMesActual = () => {
-    const fechaActual = new Date()
-    return fechaActual.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long' 
-    })
-  }
-
-  // Obtener información del mes pasado
-  const getMesPasado = () => {
-    const fechaActual = new Date()
-    const mesPasado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1)
-    return mesPasado.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long' 
-    })
-  }
-
   const mesesDisponibles = generarMeses()
   
   // Depuración: mostrar qué meses se están generando
