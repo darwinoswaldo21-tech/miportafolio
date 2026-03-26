@@ -42,6 +42,13 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   const [procesando, setProcesando] = useState(false)
   const [datosIa, setDatosIa] = useState<Partial<DatosMensualesFondo> | null>(null)
   
+  // DEPURACIÓN COMPLETA: Ver qué datos están llegando
+  console.log('🔍 MODAL - Fondo completo:', fondo)
+  console.log('🔍 MODAL - fondo.creado_en:', fondo.creado_en)
+  console.log('🔍 MODAL - typeof fondo.creado_en:', typeof fondo.creado_en)
+  console.log('🔍 MODAL - fondo.id:', fondo.id)
+  console.log('🔍 MODAL - fondo.nombre:', fondo.nombre)
+  
   // Obtener información del mes actual
   const getMesActual = () => {
     const fechaActual = new Date()
