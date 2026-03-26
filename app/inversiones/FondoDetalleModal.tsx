@@ -293,13 +293,21 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       
       if (dbError) {
         console.error('❌ Error guardando en BD:', dbError)
+        console.error('Código:', dbError.code)
+        console.error('Mensaje:', dbError.message)
+        
+        // MANEJO ESPECÍFICO PARA ERROR RLS
+        if (dbError.message.includes('row-level security policy')) {
+          throw new Error(`❌ ERROR DE PERMISOS RLS\n\nLa tabla 'fondo_imagenes' tiene políticas de seguridad que impiden inserciones.\n\n🛠️ SOLUCIÓN:\n1. Ve a Supabase Dashboard\n2. Authentication → Policies\n3. Busca la tabla 'fondo_imagenes'\n4. Deshabilita RLS o crea una política que permita INSERT\n5. O ejecuta: ALTER TABLE fondo_imagenes DISABLE ROW LEVEL SECURITY;`)
+        }
+        
         throw new Error(`Error guardando en BD: ${dbError.message}`)
       }
       
       console.log('✅ Imagen guardada exitosamente en BD y Storage')
       
       // Mostrar mensaje de éxito
-      alert(`✅ Imagen guardada exitosamente (DIRECTO):\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${buffer.length} bytes\n📅 Mes: ${mesSeleccionado}\n� URL: ${publicUrl}`)
+      alert(`✅ Imagen guardada exitosamente (DIRECTO):\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${buffer.length} bytes\n📅 Mes: ${mesSeleccionado}\n🔗 URL: ${publicUrl}`)
       
       // Limpiar formulario
       setImagenSubida(null)
