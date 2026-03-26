@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
-  console.log('🚀 API RECIBIDA - Iniciando subida completa...')
+  console.log('🚀 API RECIBIDA - Iniciando subida CORREGIDA...')
   
   try {
     const formData = await request.formData()
@@ -36,66 +36,86 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
 
-    // PRIMERO: Probar conexión simple
-    console.log('� Probando conexión con Supabase...')
-    const { data: testData, error: testError } = await supabase
-      .from('fondo_imagenes')
-      .select('count')
-      .single()
+    // Convertir imagen a buffer
+    const bytes = await imagen.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    const fileExt = imagen.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const fileName = `fondo-${fondo_id}-${mes.replace(/\s+/g, '-')}.${fileExt}`
+    
+    console.log('📁 Subiendo archivo:', fileName)
+    console.log('📊 Tamaño:', buffer.length, 'bytes')
+    
+    // Subir a Supabase Storage
+    console.log('📤 Subiendo a Supabase Storage...')
+    const { data, error } = await supabase.storage
+      .from('fondos-imagenes')
+      .upload(fileName, buffer, {
+        contentType: imagen.type,
+        upsert: false
+      })
 
-    console.log('📊 Resultado prueba conexión:')
-    console.log('- testData:', testData)
-    console.log('- testError:', testError)
+    console.log('📊 Resultado subida Storage:')
+    console.log('- data:', data)
+    console.log('- error:', error)
 
-    if (testError) {
-      console.error('❌ Error de conexión con Supabase:', testError)
+    if (error) {
+      console.error('❌ Error subiendo a Storage:', error)
       return NextResponse.json(
-        { success: false, error: 'Error conectando con Supabase', details: testError.message },
+        { success: false, error: 'Error subiendo imagen', details: error.message },
         { status: 500 }
       )
     }
 
-    // SEGUNDO: Intentar inserción simple
-    console.log('💾 Intentando inserción simple...')
-    const datosPrueba = {
+    // Obtener URL pública
+    const { data: { publicUrl } } = supabase.storage
+      .from('fondos-imagenes')
+      .getPublicUrl(fileName)
+
+    console.log('✅ Imagen subida exitosamente')
+    console.log('🔗 URL pública:', publicUrl)
+
+    // Guardar en base de datos con CAMPOS CORRECTOS
+    console.log('💾 Guardando en base de datos...')
+    const datosBD = {
       fondo_id: parseInt(fondo_id),
       mes: mes,
-      nombre_archivo: 'prueba.jpg',
-      tipo_archivo: 'jpg',
-      tamaño_bytes: 1234,
-      url_storage: 'prueba.jpg',
-      url_publica: 'https://prueba.com',
+      nombre_archivo: imagen.name,
+      tipo_archivo: fileExt,
+      tamaño_bytes: buffer.length,
+      url_imagen: publicUrl, // ✅ CAMPO CORRECTO
       creado_en: new Date().toISOString()
     }
     
-    console.log('- datos de prueba:', datosPrueba)
+    console.log('- datos a guardar:', datosBD)
     
-    const { error: insertError } = await supabase
+    const { error: dbError } = await supabase
       .from('fondo_imagenes')
-      .insert(datosPrueba)
+      .insert(datosBD)
 
-    console.log('📊 Resultado inserción:')
-    console.log('- insertError:', insertError)
+    console.log('📊 Resultado guardado BD:')
+    console.log('- dbError:', dbError)
 
-    if (insertError) {
-      console.error('❌ Error en inserción:', insertError)
-      console.error('Código:', insertError.code)
-      console.error('Mensaje:', insertError.message)
-      console.error('Detalles:', insertError.details)
-      
+    if (dbError) {
+      console.error('❌ Error guardando en BD:', dbError)
       return NextResponse.json(
-        { success: false, error: 'Error guardando en Supabase', details: insertError.message, code: insertError.code },
+        { success: false, error: 'Error guardando registro', details: dbError.message },
         { status: 500 }
       )
     }
 
-    console.log('✅ Inserción exitosa')
+    console.log('✅ Imagen guardada exitosamente en BD y Storage')
 
     return NextResponse.json({
       success: true,
-      message: 'PRUEBA: Inserción exitosa en Supabase',
-      test: true,
-      datos: datosPrueba
+      message: 'Imagen subida y guardada exitosamente',
+      datos: {
+        id: data.id,
+        nombre_archivo: fileName,
+        url_imagen: publicUrl, // ✅ CAMPO CORRECTO
+        tamaño_bytes: buffer.length,
+        mes: mes,
+        fondo_id: parseInt(fondo_id)
+      }
     })
 
   } catch (error) {
