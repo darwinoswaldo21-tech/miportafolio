@@ -103,7 +103,7 @@ export default function FondosPage() {
     setMostrarFormulario(true)
     setFormData({
       ...formData,
-      rentabilidad_esperada: fondo.rentabilidad_anual.toString()
+      nombre_inversion: `Inversión en ${fondo.nombre}`
     })
   }
 
@@ -122,7 +122,7 @@ export default function FondosPage() {
           user_id: user.id,
           fondo_id: fondoSeleccionado.id,
           ...formData,
-          rentabilidad_esperada: parseFloat(formData.capital_inicial) * 0.01 // Temporal
+          rentabilidad_esperada: fondoSeleccionado.rentabilidad_anual
         })
       })
 
@@ -317,11 +317,10 @@ export default function FondosPage() {
                   Capital inicial ($)
                 </label>
                 <Input
-                  type="number"
+                  type="text"
                   value={formData.capital_inicial}
                   onChange={(e) => setFormData({...formData, capital_inicial: e})}
                   placeholder="1000"
-                  step="0.01"
                   required
                 />
               </div>
@@ -331,11 +330,10 @@ export default function FondosPage() {
                   Aporte mensual programado ($)
                 </label>
                 <Input
-                  type="number"
+                  type="text"
                   value={formData.aporte_mensual}
                   onChange={(e) => setFormData({...formData, aporte_mensual: e})}
                   placeholder="100"
-                  step="0.01"
                 />
               </div>
 
@@ -344,11 +342,10 @@ export default function FondosPage() {
                   Aporte extra mensual ($) - Opcional
                 </label>
                 <Input
-                  type="number"
+                  type="text"
                   value={formData.aporte_extra}
                   onChange={(e) => setFormData({...formData, aporte_extra: e})}
                   placeholder="50"
-                  step="0.01"
                 />
               </div>
 
