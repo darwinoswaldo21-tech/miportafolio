@@ -37,14 +37,33 @@ interface FondoDetalleModalProps {
 
 export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   const [editando, setEditando] = useState(false)
-  const [mesSeleccionado, setMesSeleccionado] = useState('Marzo 2026')
+  const [mesSeleccionado, setMesSeleccionado] = useState(getMesActual()) // Usar el mes actual dinámicamente
   const [imagenSubida, setImagenSubida] = useState<File | null>(null)
   const [procesando, setProcesando] = useState(false)
   const [datosIa, setDatosIa] = useState<Partial<DatosMensualesFondo> | null>(null)
   
+  // Obtener información del mes actual
+  const getMesActual = () => {
+    const fechaActual = new Date()
+    return fechaActual.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long' 
+    })
+  }
+
+  // Obtener información del mes pasado
+  const getMesPasado = () => {
+    const fechaActual = new Date()
+    const mesPasado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1)
+    return mesPasado.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long' 
+    })
+  }
+  
   const [datosMensuales, setDatosMensuales] = useState<DatosMensualesFondo>({
     fondo_id: fondo.id,
-    mes: 'Marzo 2026',
+    mes: getMesActual(), // Usar el mes actual dinámicamente
     unidades_participacion: fondo.unidades || 226.92760352,
     valor_unidad: fondo.valor_unidad_base || 1.34906548,
     valor_total_mes: 306.22,
