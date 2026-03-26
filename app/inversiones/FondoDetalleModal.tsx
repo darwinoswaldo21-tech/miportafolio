@@ -53,24 +53,26 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     notas: ''
   })
 
-  // Generar lista de meses desde la fecha de inicio
+  // Generar lista de meses desde la fecha de inicio hasta el mes actual
   const generarMeses = () => {
     const meses = []
     const fechaInicio = new Date(fondo.creado_en)
     const fechaActual = new Date()
     
-    let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
+    // Empezar desde el mes anterior al actual (el más antiguo disponible)
+    let currentDate = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1)
     
-    while (currentDate <= fechaActual) {
+    // Generar meses hacia atrás hasta la fecha de inicio
+    while (currentDate >= fechaInicio) {
       const nombreMes = currentDate.toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long' 
       })
-      meses.push(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
-      currentDate.setMonth(currentDate.getMonth() + 1)
+      meses.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+      currentDate.setMonth(currentDate.getMonth() - 1)
     }
     
-    return meses.reverse() // Mes más reciente primero
+    return meses
   }
 
   const mesesDisponibles = generarMeses()
