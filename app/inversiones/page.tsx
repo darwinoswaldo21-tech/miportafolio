@@ -45,6 +45,14 @@ interface FondoInversion {
   es_fondo_unidades: boolean
 }
 
+interface DetalleGananciaFondo {
+  nombre: string
+  inversionInicial: number
+  valorActual: number
+  ganancia: number
+  porcentaje: number
+}
+
 type TodasLasInversiones = Inversion | FondoInversion
 
 export default function InversionesPage() {
@@ -117,6 +125,61 @@ export default function InversionesPage() {
 
   const fondosDeInversion = todasLasInversiones.filter(esFondoInversion)
   const plazosFijos = todasLasInversiones.filter(inv => !esFondoInversion(inv))
+  
+  // Calcular ganancias de fondos de inversión
+  const calcularGananciasFondos = () => {
+    console.log('🧮 Calculando ganancias de todos los fondos...')
+    
+    if (fondosDeInversion.length === 0) {
+      return {
+        totalInvertido: 0,
+        valorActual: 0,
+        gananciaTotal: 0,
+        porcentajeTotal: 0,
+        detallesPorFondo: [] as DetalleGananciaFondo[]
+      }
+    }
+    
+    let totalInvertido = 0
+    let valorActual = 0
+    const detallesPorFondo: DetalleGananciaFondo[] = []
+    
+    fondosDeInversion.forEach(fondo => {
+      // Calcular valor actual basado en unidades y valor liquidativo
+      const valorActualFondo = fondo.unidades * fondo.valor_liquidativo
+      const inversionInicialFondo = fondo.valor_unidad_base * fondo.unidades
+      const gananciaFondo = valorActualFondo - inversionInicialFondo
+      const porcentajeFondo = inversionInicialFondo > 0 ? (gananciaFondo / inversionInicialFondo) * 100 : 0
+      
+      totalInvertido += inversionInicialFondo
+      valorActual += valorActualFondo
+      
+      detallesPorFondo.push({
+        nombre: fondo.nombre,
+        inversionInicial: inversionInicialFondo,
+        valorActual: valorActualFondo,
+        ganancia: gananciaFondo,
+        porcentaje: porcentajeFondo
+      })
+    })
+    
+    const gananciaTotal = valorActual - totalInvertido
+    const porcentajeTotal = totalInvertido > 0 ? (gananciaTotal / totalInvertido) * 100 : 0
+    
+    console.log('💰 Resultados generales:')
+    console.log('- Total invertido:', totalInvertido)
+    console.log('- Valor actual:', valorActual)
+    console.log('- Ganancia total:', gananciaTotal)
+    console.log('- Porcentaje total:', porcentajeTotal)
+    
+    return {
+      totalInvertido,
+      valorActual,
+      gananciaTotal,
+      porcentajeTotal,
+      detallesPorFondo
+    }
+  }
   
   // Depuración: mostrar qué se está cargando
   console.log('🔍 Total inversiones combinadas:', todasLasInversiones.length)
@@ -191,18 +254,17 @@ export default function InversionesPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        {/* Estadísticas */}
-        <Card className="mb-4">
-          <CardHeader className="pb-2">
-            <h2 className="text-lg font-bold">📊 Resumen de Inversiones</h2>
+        {/* Estadísticas Generales */}
+        <Card>
+          <CardHeader>
+            <h2 className="text-lg font-bold text-gray-900">📊 Estadísticas Generales</h2>
           </CardHeader>
-          <CardContent className="p-3">
+          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div className="text-center p-3 bg-green-50 rounded">
                 <div className="text-2xl font-bold text-green-600">
                   ${totalInvertido.toLocaleString()}
                 </div>
-                <div className="text-sm text-gray-600">Total Invertido</div>
               </div>
               <div className="text-center p-3 bg-blue-50 rounded">
                 <div className="text-2xl font-bold text-blue-600">
@@ -225,6 +287,77 @@ export default function InversionesPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Resumen de Ganancias de Fondos */}
+        {fondosDeInversion.length > 0 && (
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-bold text-green-600">💰 Resumen de Ganancias - Fondos de Inversión</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Resumen General */}
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-600 mb-1">💻 Inversión Total</div>
+                      <div className="text-xl font-bold text-blue-600">
+                        ${calcularGananciasFondos().totalInvertido.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-600 mb-1">💎 Valor Actual</div>
+                      <div className="text-xl font-bold text-green-600">
+                        ${calcularGananciasFondos().valorActual.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-600 mb-1">📈 Ganancia/Pérdida</div>
+                      <div className={`text-xl font-bold ${calcularGananciasFondos().gananciaTotal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGananciasFondos().gananciaTotal >= 0 ? '📈 +' : '📉 '}
+                        ${Math.abs(calcularGananciasFondos().gananciaTotal).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-600 mb-1">📊 Rendimiento</div>
+                      <div className={`text-xl font-bold ${calcularGananciasFondos().porcentajeTotal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGananciasFondos().porcentajeTotal >= 0 ? '📈 +' : '📉 '}
+                        {Math.abs(calcularGananciasFondos().porcentajeTotal).toFixed(2)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detalles por Fondo */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">📈 Detalles por Fondo:</h3>
+                  {calcularGananciasFondos().detallesPorFondo.map((detalle, index) => (
+                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{detalle.nombre}</div>
+                          <div className="text-xs text-gray-600">
+                            ${detalle.inversionInicial.toLocaleString('es-ES', { minimumFractionDigits: 2 })} → ${detalle.valorActual.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-bold ${detalle.ganancia >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {detalle.ganancia >= 0 ? '📈 +' : '📉 '}
+                            ${Math.abs(detalle.ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </div>
+                          <div className={`text-xs ${detalle.porcentaje >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {detalle.porcentaje >= 0 ? '📈 +' : '📉 '}
+                            {Math.abs(detalle.porcentaje).toFixed(2)}%
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Fondos de Inversión */}
         <Card>
