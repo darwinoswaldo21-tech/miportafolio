@@ -209,14 +209,14 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
           </Button>
         </div>
       </CardContent>
-    </Card>
 
-    {/* Modal de detalles del fondo */}
-    {selectedInversion && (
-      <FondoDetalleModal 
-        fondo={selectedInversion} 
-        onClose={() => setSelectedInversion(null)} 
-      />
-    )}
+      {/* Modal de detalles del fondo */}
+      {selectedInversion && (
+        <FondoDetalleModal 
+          fondo={selectedInversion} 
+          onClose={() => setSelectedInversion(null)} 
+        />
+      )}
+    </Card>
   )
 }
