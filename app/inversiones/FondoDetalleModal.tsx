@@ -265,52 +265,13 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       }
       
       const cloudinaryData = await response.json()
-      console.log('✅ Imagen subida a Cloudinary:', cloudinaryData)
+      console.log(' Imagen subida a Cloudinary:', cloudinaryData)
       
-      // Guardar en base de datos (solo la URL de Cloudinary)
-      console.log('💾 Guardando URL de Cloudinary en base de datos...')
-      const { createClient } = await import('@supabase/supabase-js')
-      
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Variables de entorno de Supabase no configuradas')
-      }
-      
-      const supabase = createClient(supabaseUrl, supabaseKey)
-      
-      const datosBD = {
-        fondo_id: fondo.id,
-        mes: mesSeleccionado,
-        nombre_archivo: imagenSubida.name,
-        tipo_archivo: imagenSubida.name.split('.').pop()?.toLowerCase() || 'jpg',
-        tamaño_bytes: imagenSubida.size,
-        url_imagen: cloudinaryData.secure_url, // URL de Cloudinary
-        creado_en: new Date().toISOString()
-      }
-      
-      console.log('- datos a guardar:', datosBD)
-      
-      const { error: dbError } = await supabase
-        .from('fondo_imagenes')
-        .insert(datosBD)
-      
-      if (dbError) {
-        console.error('❌ Error guardando en BD:', dbError)
-        
-        // MANEJO ESPECÍFICO PARA ERROR RLS
-        if (dbError.message.includes('row-level security policy')) {
-          throw new Error(`❌ ERROR DE PERMISOS RLS\n\nLa tabla 'fondo_imagenes' tiene políticas de seguridad que impiden inserciones.\n\n🛠️ SOLUCIÓN:\n1. Ve a Supabase Dashboard\n2. Authentication → Policies\n3. Busca la tabla 'fondo_imagenes'\n4. Deshabilita RLS o crea una política que permita INSERT\n5. O ejecuta: ALTER TABLE fondo_imagenes DISABLE ROW LEVEL SECURITY;`)
-        }
-        
-        throw new Error(`Error guardando en BD: ${dbError.message}`)
-      }
-      
-      console.log('✅ URL de Cloudinary guardada exitosamente en BD')
+      // TEMPORAL: Solo mostrar éxito sin guardar en BD
+      console.log(' Imagen subida exitosamente a Cloudinary (sin BD por RLS)')
       
       // Mostrar mensaje de éxito
-      alert(`✅ Imagen guardada exitosamente (CLOUDINARY):\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${imagenSubida.size} bytes\n📅 Mes: ${mesSeleccionado}\n☁️ URL: ${cloudinaryData.secure_url}`)
+      alert(` Imagen subida exitosamente a CLOUDINARY:\n Archivo: ${imagenSubida.name}\n Tamaño: ${imagenSubida.size} bytes\n Mes: ${mesSeleccionado}\n URL: ${cloudinaryData.secure_url}\n\n Nota: Imagen guardada en Cloudinary. Para guardar en BD, arregla RLS en Supabase.`)
       
       // Limpiar formulario
       setImagenSubida(null)
