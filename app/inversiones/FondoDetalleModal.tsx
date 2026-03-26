@@ -119,6 +119,8 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   console.log('📅 Meses disponibles:', mesesDisponibles)
   console.log('📅 Mes seleccionado:', mesSeleccionado)
   console.log('📅 Fecha inicio fondo:', fondo.creado_en)
+  console.log('📅 Fondo completo:', fondo)
+  console.log('📅 Longitud de meses:', mesesDisponibles.length)
 
   // Calcular valor total automáticamente
   const calcularValorTotal = () => {
