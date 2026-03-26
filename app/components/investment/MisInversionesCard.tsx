@@ -23,6 +23,19 @@ interface Inversion {
   creado_en: string
 }
 
+interface FondoInversion {
+  id: number
+  nombre: string
+  gestora_nombre: string
+  valor_liquidativo: number
+  rentabilidad: number
+  plazo: number
+  estado: string
+  creado_en: string
+}
+
+type TodasLasInversiones = Inversion | FondoInversion
+
 interface MisInversionesCardProps {
   onVerInversiones?: () => void
 }
@@ -30,34 +43,81 @@ interface MisInversionesCardProps {
 export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps) {
   const { user } = useAuth()
   const [inversiones, setInversiones] = useState<Inversion[]>([])
+  const [fondos, setFondos] = useState<FondoInversion[]>([])
+  const [todasLasInversiones, setTodasLasInversiones] = useState<TodasLasInversiones[]>([])
   const [loading, setLoading] = useState(false)
 
+  const esFondoInversion = (inversion: TodasLasInversiones): inversion is FondoInversion => {
+    return 'valor_liquidativo' in inversion
+  }
+
   useEffect(() => {
-    const loadInversiones = async () => {
-      if (!user?.id) return
-      
+    const loadTodasLasInversiones = async () => {
+      setLoading(true)
       try {
-        const result = await inversionesQueries.getByUserId(user.id)
-        if (result.success && result.data) {
-          setInversiones(result.data)
+        let inversionesData: Inversion[] = []
+        let fondosData: FondoInversion[] = []
+
+        // Cargar inversiones a plazo fijo
+        try {
+          const inversionesResult = await inversionesQueries.getByUserId(user?.id?.toString() || "1")
+          if (inversionesResult.success && inversionesResult.data) {
+            inversionesData = inversionesResult.data
+            setInversiones(inversionesData)
+          }
+        } catch (error) {
+          console.log('⚠️ Error cargando inversiones a plazo fijo')
         }
+
+        // Cargar fondos de inversión
+        try {
+          const fondosResponse = await fetch('/api/fondos')
+          if (fondosResponse.ok) {
+            const fondosResult = await fondosResponse.json()
+            fondosData = fondosResult.data || []
+            setFondos(fondosData)
+          }
+        } catch (error) {
+          console.log('⚠️ Error cargando fondos de inversión')
+        }
+
+        // Combinar todas las inversiones
+        const combinadas = [
+          ...inversionesData,
+          ...fondosData
+        ].sort((a, b) => new Date(b.creado_en).getTime() - new Date(a.creado_en).getTime())
+
+        setTodasLasInversiones(combinadas)
       } catch (error) {
-        console.error('Error cargando inversiones:', error)
+        console.error('Error cargando todas las inversiones:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
     // Solo cargar si no hay datos
-    if (inversiones.length === 0) {
-      loadInversiones()
+    if (todasLasInversiones.length === 0) {
+      loadTodasLasInversiones()
     }
   }, [user?.id])
 
-  const totalInvertido = inversiones.reduce((sum, inv) => sum + parseFloat(inv.capital), 0)
+  // Calcular estadísticas combinadas
+  const totalInvertido = todasLasInversiones.reduce((sum, inv) => {
+    if ('capital' in inv) {
+      return sum + parseFloat(inv.capital)
+    } else if ('valor_liquidativo' in inv) {
+      return sum + inv.valor_liquidativo
+    }
+    return sum
+  }, 0)
+
+  const plazosFijosCount = todasLasInversiones.filter(inv => !esFondoInversion(inv)).length
+  const fondosCount = todasLasInversiones.filter(esFondoInversion).length
   
   const stats = [
-    { label: "Plazos Fijos", value: `${inversiones.filter(inv => inv.tipo === 'Plazo Fijo').length} activos` },
-    { label: "Fondos", value: `${inversiones.filter(inv => inv.tipo === 'Fondo de Inversión').length} activos` },
-    { label: "Ahorros", value: `${inversiones.filter(inv => inv.tipo === 'Ahorro Programado').length} activos` },
+    { label: "Plazos Fijos", value: `${plazosFijosCount} activos` },
+    { label: "Fondos", value: `${fondosCount} activos` },
+    { label: "Total", value: `${todasLasInversiones.length} inversiones` },
     { label: "Total invertido", value: `$${totalInvertido.toLocaleString()}` }
   ]
 
