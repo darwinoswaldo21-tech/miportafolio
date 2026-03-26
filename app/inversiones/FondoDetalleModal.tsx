@@ -114,6 +114,11 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   }
 
   const mesesDisponibles = generarMeses()
+  
+  // Depuración: mostrar qué meses se están generando
+  console.log('📅 Meses disponibles:', mesesDisponibles)
+  console.log('📅 Mes seleccionado:', mesSeleccionado)
+  console.log('📅 Fecha inicio fondo:', fondo.creado_en)
 
   // Calcular valor total automáticamente
   const calcularValorTotal = () => {
