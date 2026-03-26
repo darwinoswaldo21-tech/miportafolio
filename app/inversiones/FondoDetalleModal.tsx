@@ -346,6 +346,53 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     }
   }
 
+  // Calcular ganancias del fondo
+  const calcularGanancias = () => {
+    console.log('🧮 Calculando ganancias para el fondo:', fondo.nombre)
+    
+    // Si no hay datos mensuales, retornar null
+    if (!datosMensuales || Object.keys(datosMensuales).length === 0) {
+      console.log('❌ No hay datos mensuales para calcular ganancias')
+      return null
+    }
+    
+    // Obtener todos los meses ordenados
+    const mesesOrdenados = Object.keys(datosMensuales).sort()
+    console.log('📊 Meses disponibles:', mesesOrdenados)
+    
+    if (mesesOrdenados.length === 0) {
+      console.log('❌ No hay meses con datos')
+      return null
+    }
+    
+    // Calcular inversión inicial (primer mes)
+    const primerMes = mesesOrdenados[0]
+    const datosPrimerMes = datosMensuales[primerMes] as DatosMensualesFondo
+    const inversionInicial = datosPrimerMes?.valor_total_mes || 0
+    
+    // Calcular valor actual (último mes con datos)
+    const ultimoMes = mesesOrdenados[mesesOrdenados.length - 1]
+    const datosUltimoMes = datosMensuales[ultimoMes] as DatosMensualesFondo
+    const valorActual = datosUltimoMes?.valor_total_mes || 0
+    
+    // Calcular ganancia/pérdida
+    const ganancia = valorActual - inversionInicial
+    const porcentaje = inversionInicial > 0 ? (ganancia / inversionInicial) * 100 : 0
+    
+    console.log('💰 Resultados:')
+    console.log('- Inversión inicial:', inversionInicial)
+    console.log('- Valor actual:', valorActual)
+    console.log('- Ganancia:', ganancia)
+    console.log('- Porcentaje:', porcentaje)
+    
+    return {
+      inversionInicial,
+      valorActual,
+      ganancia,
+      porcentaje
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -356,6 +403,46 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
             <div className="border-b pb-4">
               <h4 className="font-semibold text-lg">{fondo.nombre}</h4>
               <p className="text-gray-600">{fondo.gestora_nombre}</p>
+            </div>
+
+            {/* Resumen de Ganancias */}
+            <div className="bg-green-50 p-4 rounded">
+              <h4 className="font-semibold mb-2">💰 Resumen de Ganancias</h4>
+              <div className="space-y-2">
+                {calcularGanancias() && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="font-medium">💻 Inversión Inicial:</span>
+                      <span className="font-bold text-blue-600">
+                        ${calcularGanancias()!.inversionInicial.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">💎 Valor Actual:</span>
+                      <span className="font-bold text-green-600">
+                        ${calcularGanancias()!.valorActual.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">📈 Ganancia/Pérdida:</span>
+                      <span className={`font-bold ${calcularGanancias()!.ganancia >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGanancias()!.ganancia >= 0 ? '📈 +' : '📉 '}
+                        ${Math.abs(calcularGanancias()!.ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">📊 Rendimiento:</span>
+                      <span className={`font-bold ${calcularGanancias()!.porcentaje >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGanancias()!.porcentaje >= 0 ? '📈 +' : '📉 '}
+                        {Math.abs(calcularGanancias()!.porcentaje).toFixed(2)}%
+                      </span>
+                    </div>
+                  </>
+                )}
+                <div className="text-xs text-gray-600 mt-2">
+                  💡 Basado en los datos actualizados de todos los meses.
+                </div>
+              </div>
             </div>
 
             {/* Información del Mes Actual */}
