@@ -100,6 +100,14 @@ export default function InversionesPage() {
     loadTodasLasInversiones()
   }, [user?.id])
 
+  // Separar las inversiones por tipo
+  const esFondoInversion = (inversion: TodasLasInversiones): inversion is FondoInversion => {
+    return 'valor_liquidativo' in inversion
+  }
+
+  const fondosDeInversion = todasLasInversiones.filter(esFondoInversion)
+  const plazosFijos = todasLasInversiones.filter(inv => !esFondoInversion(inv))
+
   // Calcular estadísticas combinadas
   const totalInvertido = todasLasInversiones.reduce((sum, inv) => {
     if ('capital' in inv) {
@@ -119,10 +127,6 @@ export default function InversionesPage() {
     } else {
       return 'Fondo' // Es fondo de inversión
     }
-  }
-
-  const esFondoInversion = (inversion: TodasLasInversiones): inversion is FondoInversion => {
-    return 'valor_liquidativo' in inversion
   }
 
   const getPeriodicidadAbreviada = (periodicidad: string) => {
@@ -206,17 +210,17 @@ export default function InversionesPage() {
           </CardContent>
         </Card>
 
-        {/* Lista de Inversiones */}
+        {/* Fondos de Inversión */}
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-bold">
-              Todas las Inversiones ({todasLasInversiones.length})
+            <h2 className="text-lg font-bold text-blue-600">
+              💰 Fondos de Inversión ({fondosDeInversion.length})
             </h2>
           </CardHeader>
           <CardContent>
-            {todasLasInversiones.length > 0 ? (
+            {fondosDeInversion.length > 0 ? (
               <div className="space-y-4">
-                {todasLasInversiones.map((inversion) => (
+                {fondosDeInversion.map((inversion) => (
                   <div 
                     key={inversion.id} 
                     className="border p-4 rounded-lg hover:bg-gray-50 transition-colors"
@@ -227,7 +231,86 @@ export default function InversionesPage() {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {inversion.nombre}
                           </h3>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            inversion.estado === 'Activo' 
+                              ? 'bg-green-100 text-green-800'
+                              : inversion.estado === 'Finalizada'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {inversion.estado}
+                          </span>
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mb-3">
+                          {inversion.gestora_nombre}
+                        </p>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                          <div>
+                            <span className="text-gray-500">Tipo:</span>
+                            <div className="font-medium">{getTipoAbreviado(inversion)}</div>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Valor Liquidativo:</span>
+                            <div className="font-medium text-green-600">
+                              ${inversion.valor_liquidativo.toLocaleString()}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Rentabilidad:</span>
+                            <div className="font-medium">
+                              {inversion.rentabilidad}%
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Plazo:</span>
+                            <div className="font-medium">
+                              {inversion.plazo} días
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No tienes fondos de inversión registrados</p>
+                <Button 
+                  onClick={() => window.location.href = '/fondos/crear'}
+                  className="mt-4"
+                >
+                  Crear mi primer fondo
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Inversiones a Plazo Fijo */}
+        <Card className="mt-6">
+          <CardHeader>
+            <h2 className="text-lg font-bold text-green-600">
+              🏦 Inversiones a Plazo Fijo ({plazosFijos.length})
+            </h2>
+          </CardHeader>
+          <CardContent>
+            {plazosFijos.length > 0 ? (
+              <div className="space-y-4">
+                {plazosFijos.map((inversion) => (
+                  <div 
+                    key={inversion.id} 
+                    className="border p-4 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {inversion.nombre}
+                          </h3>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                             inversion.estado === 'Activa' 
                               ? 'bg-green-100 text-green-800'
                               : inversion.estado === 'Finalizada'
@@ -239,7 +322,7 @@ export default function InversionesPage() {
                         </div>
                         
                         <p className="text-sm text-gray-600 mb-3">
-                          {esFondoInversion(inversion) ? inversion.gestora_nombre : inversion.entidad}
+                          {esFondoInversion(inversion) ? inversion.gestora_nombre : (inversion as Inversion).entidad}
                         </p>
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
@@ -248,24 +331,20 @@ export default function InversionesPage() {
                             <div className="font-medium">{getTipoAbreviado(inversion)}</div>
                           </div>
                           <div>
-                            <span className="text-gray-500">
-                              {esFondoInversion(inversion) ? 'Valor Liquidativo:' : 'Capital:'}
-                            </span>
+                            <span className="text-gray-500">Capital:</span>
                             <div className="font-medium text-green-600">
                               ${esFondoInversion(inversion) 
                                 ? inversion.valor_liquidativo.toLocaleString() 
-                                : parseFloat(inversion.capital).toLocaleString()
+                                : parseFloat((inversion as Inversion).capital).toLocaleString()
                               }
                             </div>
                           </div>
                           <div>
-                            <span className="text-gray-500">
-                              {esFondoInversion(inversion) ? 'Rentabilidad:' : 'Tasa:'}
-                            </span>
+                            <span className="text-gray-500">Tasa:</span>
                             <div className="font-medium">
                               {esFondoInversion(inversion) 
                                 ? `${inversion.rentabilidad}%` 
-                                : `${inversion.tasa_interes}%`
+                                : `${(inversion as Inversion).tasa_interes}%`
                               }
                             </div>
                           </div>
@@ -274,68 +353,22 @@ export default function InversionesPage() {
                             <div className="font-medium">
                               {esFondoInversion(inversion) 
                                 ? `${inversion.plazo} días` 
-                                : `${inversion.plazo_dias} días`
+                                : `${(inversion as Inversion).plazo_dias} días`
                               }
                             </div>
                           </div>
-                          <div>
-                            <span className="text-gray-500">Periodicidad:</span>
-                            <div className="font-medium">
-                              {getPeriodicidadAbreviada(esFondoInversion(inversion) ? 'Mensual' : inversion.periodicidad_pago)}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Inicio:</span>
-                            <div className="font-medium">
-                              {new Date(inversion.fecha_inicio).toLocaleDateString('es-EC')}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Vencimiento:</span>
-                            <div className="font-medium">
-                              {new Date(inversion.fecha_vencimiento).toLocaleDateString('es-EC')}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Creada:</span>
-                            <div className="font-medium">
-                              {new Date(inversion.creado_en).toLocaleDateString('es-EC')}
-                            </div>
-                          </div>
                         </div>
-
-                        {inversion.notas && (
-                          <div className="mt-3 p-2 bg-gray-50 rounded text-sm">
-                            <span className="text-gray-500">Notas:</span> {inversion.notas}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="ml-4">
-                        <Button 
-                          variant="primary" 
-                          size="sm"
-                          onClick={() => setSelectedInversion(inversion)}
-                        >
-                          📋 Ver Detalles
-                        </Button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">📊</div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No tienes inversiones registradas
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  Crea tu primera inversión para comenzar a gestionar tu portafolio
-                </p>
+              <div className="text-center py-8">
+                <p className="text-gray-500">No tienes inversiones a plazo fijo registradas</p>
                 <Button 
-                  variant="primary" 
                   onClick={() => window.location.href = '/'}
+                  className="mt-4"
                 >
                   Crear mi primera inversión
                 </Button>
