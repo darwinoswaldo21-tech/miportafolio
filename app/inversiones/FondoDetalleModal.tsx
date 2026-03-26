@@ -60,14 +60,9 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
 
   // Obtener fecha de inicio formateada
   const getFechaInicioFormateada = () => {
-    // FORZAR: Siempre usar junio 2025 para este fondo específico
-    const fechaForzada = new Date('2025-06-01')
-    const resultado = fechaForzada.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long' 
-    })
-    console.log('🔍 getFechaInicioFormateada() - FORZANDO junio 2025:', resultado)
-    return resultado
+    // FORZAR: Siempre devolver "Junio de 2025" para este fondo específico
+    console.log('🔍 getFechaInicioFormateada() - FORZANDO "Junio de 2025"')
+    return "Junio de 2025"
   }
 
   const [datosMensuales, setDatosMensuales] = useState<DatosMensualesFondo>({
