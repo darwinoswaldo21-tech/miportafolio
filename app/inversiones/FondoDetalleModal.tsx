@@ -90,9 +90,9 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     
     const meses = []
     
-    // Validar y obtener fecha de inicio del fondo
+    // FORZAR: Siempre usar una fecha de inicio válida
     let fechaInicio: Date
-    if (fondo.creado_en) {
+    if (fondo.creado_en && fondo.creado_en !== null && fondo.creado_en !== undefined) {
       fechaInicio = new Date(fondo.creado_en)
       console.log('🔍 fechaInicio desde creado_en:', fechaInicio)
       console.log('🔍 isNaN(fechaInicio.getTime()):', isNaN(fechaInicio.getTime()))
@@ -105,11 +105,11 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
         console.log('⚠️ Fecha de creación inválida, usando fecha por defecto:', fechaInicio)
       }
     } else {
-      // Si no hay fecha de creación, usar una fecha por defecto (hace 6 meses)
+      // FORZAR: Siempre usar una fecha por defecto (hace 6 meses) para garantizar meses
       const fechaDefecto = new Date()
       fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
       fechaInicio = fechaDefecto
-      console.log('⚠️ No hay fecha de creación, usando fecha por defecto:', fechaInicio)
+      console.log('⚠️ Forzando fecha por defecto (hace 6 meses):', fechaInicio)
     }
     
     const fechaActual = new Date()
@@ -120,17 +120,39 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     console.log('🔍 currentDate inicial:', currentDate)
     
     // Generar meses hacia adelante hasta el mes ACTUAL (todos los meses)
-    while (currentDate <= fechaActual) {
+    let contador = 0
+    while (currentDate <= fechaActual && contador < 24) { // Máximo 24 meses para evitar bucles infinitos
       const nombreMes = currentDate.toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long' 
       })
-      meses.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+      const mesFormateado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)
+      meses.unshift(mesFormateado)
       currentDate.setMonth(currentDate.getMonth() + 1)
-      console.log('🔍 Añadiendo mes:', nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+      console.log('🔍 Añadiendo mes:', mesFormateado)
+      contador++
     }
     
     console.log('🔍 Meses generados:', meses)
+    console.log('🔍 Total meses:', meses.length)
+    
+    // FORZAR: Siempre devolver al menos algunos meses
+    if (meses.length === 0) {
+      const fechaDefecto = new Date()
+      fechaDefecto.setMonth(fechaDefecto.getMonth() - 3)
+      const mesesForzados = []
+      for (let i = 0; i < 4; i++) {
+        const fecha = new Date(fechaDefecto.getFullYear(), fechaDefecto.getMonth() + i, 1)
+        const nombreMes = fecha.toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long' 
+        })
+        mesesForzados.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+      }
+      console.log('🔍 Meses forzados:', mesesForzados)
+      return mesesForzados.reverse()
+    }
+    
     return meses.reverse() // Mes más reciente primero
   }
 
