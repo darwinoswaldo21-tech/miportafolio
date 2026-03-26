@@ -214,7 +214,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       return
     }
     
-    console.log('🚀 Iniciando subida a CLOUDINARY...')
+    console.log('🚀 Iniciando subida a CLOUDINARY... (ACTUALIZADO)')
     console.log('- imagenSubida:', imagenSubida?.name)
     console.log('- fondo_id:', fondo.id)
     console.log('- mes:', mesSeleccionado)
