@@ -40,30 +40,33 @@ export async function POST(request: NextRequest) {
       console.log('⚠️ No se encontró la fiduciaria, se usará como texto plano')
     }
 
-    // Insertar en la tabla fondos_inversion con la estructura correcta
+    // Preparar datos exactamente como en la tabla
+    const fondoData = {
+      user_id: null, // Por ahora null, después se puede actualizar con auth
+      nombre: nombre.trim(),
+      gestora_id: gestora_id,
+      gestora_nombre: gestora_nombre.trim(),
+      plazo: parseInt(plazo_dias) || 360,
+      valor_liquidativo: parseFloat(valor_liquidativo),
+      rentabilidad: parseFloat(rentabilidad),
+      aporte_mensual: parseFloat(aporte_mensual) || 0,
+      fecha_inicio: fecha_inicio || new Date().toISOString().split('T')[0],
+      fecha_vencimiento: fecha_vencimiento || new Date().toISOString().split('T')[0],
+      estado: estado || 'Activo',
+      notas: notas || '',
+      creado_en: new Date().toISOString(),
+      unidades: 0,
+      valor_unidad_base: parseFloat(valor_liquidativo),
+      fecha_base: new Date().toISOString().split('T')[0],
+      es_fondo_unidades: false
+    }
+
+    console.log('📊 Datos a insertar:', fondoData)
+
+    // Insertar en la tabla fondos_inversion
     const { data, error } = await supabase
       .from('fondos_inversion')
-      .insert([
-        {
-          user_id: null, // Se puede actualizar después si hay autenticación
-          nombre: nombre.trim(),
-          gestora_id: gestora_id,
-          gestora_nombre: gestora_nombre.trim(),
-          plazo: parseInt(plazo_dias) || 360,
-          valor_liquidativo: parseFloat(valor_liquidativo),
-          rentabilidad: parseFloat(rentabilidad),
-          aporte_mensual: parseFloat(aporte_mensual) || 0,
-          fecha_inicio: fecha_inicio || new Date().toISOString().split('T')[0],
-          fecha_vencimiento: fecha_vencimiento || new Date().toISOString().split('T')[0],
-          estado: estado || 'Activo',
-          notas: notas || '',
-          creado_en: new Date().toISOString(),
-          unidades: 0, // Por defecto
-          valor_unidad_base: parseFloat(valor_liquidativo),
-          fecha_base: new Date().toISOString().split('T')[0],
-          es_fondo_unidades: false // Por defecto
-        }
-      ])
+      .insert([fondoData])
       .select()
 
     console.log('📊 Resultado de la inserción:', { data, error })
@@ -73,7 +76,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Error al crear el fondo', 
-          details: error.message 
+          details: error.message,
+          full_error: error
         },
         { status: 500 }
       )
@@ -92,7 +96,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Error interno del servidor',
-        details: error instanceof Error ? error.message : 'Error desconocido'
+        details: error instanceof Error ? error.message : 'Error desconocido',
+        full_error: error
       },
       { status: 500 }
     )
