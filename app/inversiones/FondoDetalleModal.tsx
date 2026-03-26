@@ -221,36 +221,42 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     
     setProcesando(true)
     try {
+      // Crear FormData manualmente
       const formData = new FormData()
       formData.append('imagen', imagenSubida)
       formData.append('fondo_id', fondo.id.toString())
       formData.append('mes', mesSeleccionado)
       
-      // Si hay datos de IA, incluirlos
-      if (datosIa) {
-        formData.append('datos_extraidos', JSON.stringify(datosIa))
+      console.log('📤 Enviando fetch a /api/subir-imagen-fondo...')
+      console.log('FormData entries:')
+      for (let [key, value] of formData.entries()) {
+        console.log(`- ${key}:`, value)
       }
       
-      console.log('📤 Enviando fetch a /api/subir-imagen-fondo...')
       const response = await fetch('/api/subir-imagen-fondo', {
         method: 'POST',
-        body: formData
+        body: formData,
+        // Añadir headers explícitos
+        headers: {
+          'Accept': 'application/json',
+        },
       })
       
       console.log('📊 Respuesta recibida:')
       console.log('- status:', response.status)
       console.log('- ok:', response.ok)
       console.log('- statusText:', response.statusText)
+      console.log('- headers:', Object.fromEntries(response.headers.entries()))
       
       if (response.ok) {
         const resultado = await response.json()
         console.log('📊 Resultado JSON:', resultado)
         
         if (resultado.success) {
-          console.log('✅ Imagen guardada permanentemente:', resultado.datos.url_publica)
+          console.log('✅ Imagen guardada permanentemente')
           
           // Mostrar mensaje de éxito
-          alert(`✅ Imagen guardada exitosamente:\n📁 Archivo: ${resultado.datos.nombre_archivo}\n🔗 URL: ${resultado.datos.url_publica}`)
+          alert(`✅ Imagen guardada exitosamente:\n📁 Archivo: ${imagenSubida.name}\n🔗 URL: ${resultado.message}`)
           
           // Limpiar formulario
           setImagenSubida(null)
@@ -261,7 +267,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
         }
       } else {
         console.log('❌ Error HTTP:', response.status, response.statusText)
-        alert('❌ Error en la respuesta del servidor')
+        alert(`❌ Error en la respuesta del servidor (${response.status})`)
       }
     } catch (error) {
       console.error('❌ Error en frontend:', error)
