@@ -111,13 +111,44 @@ export default function CrearFondoPage() {
 
     setLoading(true)
     try {
-      // Simulación de guardado
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      console.log('🔍 Guardando fondo en la base de datos...')
       
+      // Preparar los datos para guardar
+      const fondoData = {
+        nombre: formData.nombre,
+        tipo: 'Personalizado',
+        administradora: formData.administradora,
+        rentabilidad_anual: formData.rentabilidad,
+        riesgo: 'Medio', // Por defecto para fondos personalizados
+        estado: formData.estado,
+        created_at: new Date().toISOString()
+      }
+
+      console.log('📊 Datos a guardar:', fondoData)
+
+      // Guardar en Supabase
+      const response = await fetch('/api/fondos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fondoData)
+      })
+
+      const result = await response.json()
+      console.log('📡 Respuesta del servidor:', result)
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al guardar el fondo')
+      }
+
+      console.log('✅ Fondo guardado exitosamente:', result)
       alert('¡Fondo de inversión creado exitosamente!')
       window.location.href = '/fondos'
+      
     } catch (error) {
-      console.error('Error creando fondo:', error)
+      console.error('❌ Error creando fondo:', error)
+      alert(`Error al crear el fondo: ${error instanceof Error ? error.message : 'Error desconocido'}`)
     } finally {
       setLoading(false)
     }
