@@ -292,7 +292,7 @@ export default function InversionesPage() {
         {fondosDeInversion.length > 0 && (
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-bold text-green-600">💰 Resumen de Ganancias - Fondos de Inversión</h2>
+              <h2 className="text-lg font-bold text-green-600">💰 Resumen de Ganancias - Fondos de Inversión (ACTUALIZADO)</h2>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
