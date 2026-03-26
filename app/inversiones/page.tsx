@@ -63,24 +63,32 @@ export default function InversionesPage() {
 
         // Cargar inversiones a plazo fijo
         try {
+          console.log('🔍 Cargando inversiones a plazo fijo...')
           const inversionesResult = await inversionesQueries.getByUserId(user?.id?.toString() || "1")
+          console.log('📊 Resultado inversiones:', inversionesResult)
+          
           if (inversionesResult.success && inversionesResult.data) {
             inversionesData = inversionesResult.data
             setInversiones(inversionesData)
+            console.log('✅ Inversiones cargadas:', inversionesData.length)
           }
         } catch (error) {
-          console.log('⚠️ No se pudieron cargar inversiones a plazo fijo')
+          console.log('⚠️ Error cargando inversiones a plazo fijo:', error)
         }
 
         // Cargar fondos de inversión
         try {
+          console.log('🔍 Cargando fondos de inversión...')
           const fondosResponse = await fetch('/api/fondos')
+          console.log('📊 Respuesta fondos:', fondosResponse.status)
+          
           if (fondosResponse.ok) {
             fondosData = await fondosResponse.json()
             setFondos(fondosData.data || [])
+            console.log('✅ Fondos cargados:', fondosData.data?.length || 0)
           }
         } catch (error) {
-          console.log('⚠️ No se pudieron cargar fondos de inversión')
+          console.log('⚠️ Error cargando fondos de inversión:', error)
         }
 
         // Combinar todas las inversiones
@@ -90,8 +98,9 @@ export default function InversionesPage() {
         ].sort((a, b) => new Date(b.creado_en).getTime() - new Date(a.creado_en).getTime())
 
         setTodasLasInversiones(combinadas)
+        console.log('✅ Todas las inversiones combinadas:', combinadas.length)
       } catch (error) {
-        console.error('Error cargando todas las inversiones:', error)
+        console.error('❌ Error general cargando inversiones:', error)
       } finally {
         setLoading(false)
       }
