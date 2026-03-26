@@ -90,40 +90,24 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     
     const meses = []
     
-    // FORZAR: Siempre usar una fecha de inicio válida para garantizar meses
-    let fechaInicio: Date
+    // FORZAR EXTREMO: Siempre usar una fecha de inicio fija para garantizar meses
+    // Usar una fecha de hace 6 meses para asegurar múltiples meses disponibles
+    const fechaForzada = new Date()
+    fechaForzada.setMonth(fechaForzada.getMonth() - 6)
+    const fechaInicio = fechaForzada
     
-    // Intentar usar la fecha real del fondo
-    if (fondo.creado_en && fondo.creado_en !== null && fondo.creado_en !== undefined) {
-      fechaInicio = new Date(fondo.creado_en)
-      console.log('🔍 fechaInicio desde creado_en:', fechaInicio)
-      console.log('🔍 isNaN(fechaInicio.getTime()):', isNaN(fechaInicio.getTime()))
-      
-      // Si la fecha es inválida, usar una fecha por defecto (hace 6 meses)
-      if (isNaN(fechaInicio.getTime())) {
-        const fechaDefecto = new Date()
-        fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
-        fechaInicio = fechaDefecto
-        console.log('⚠️ Fecha de creación inválida, usando fecha por defecto:', fechaInicio)
-      }
-    } else {
-      // FORZAR: Siempre usar una fecha por defecto (hace 6 meses) para garantizar meses
-      const fechaDefecto = new Date()
-      fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
-      fechaInicio = fechaDefecto
-      console.log('⚠️ Forzando fecha por defecto (hace 6 meses):', fechaInicio)
-    }
+    console.log('🔍 Fecha forzada de inicio:', fechaInicio)
     
     const fechaActual = new Date()
     console.log('🔍 fechaActual:', fechaActual)
     
-    // Empezar desde el mes exacto de inicio del fondo
+    // Empezar desde el mes exacto de inicio forzado
     let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
     console.log('🔍 currentDate inicial:', currentDate)
     
     // Generar meses hacia adelante hasta el mes ACTUAL (todos los meses)
     let contador = 0
-    while (currentDate <= fechaActual && contador < 24) { // Máximo 24 meses para evitar bucles infinitos
+    while (currentDate <= fechaActual && contador < 24) { // Máximo 24 meses
       const nombreMes = currentDate.toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long' 
@@ -138,21 +122,23 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     console.log('🔍 Meses generados:', meses)
     console.log('🔍 Total meses:', meses.length)
     
-    // FORZAR: Siempre devolver al menos algunos meses
+    // FORZAR: Si por alguna razón no hay meses, crear manualmente
     if (meses.length === 0) {
-      const fechaDefecto = new Date()
-      fechaDefecto.setMonth(fechaDefecto.getMonth() - 3)
-      const mesesForzados = []
-      for (let i = 0; i < 4; i++) {
-        const fecha = new Date(fechaDefecto.getFullYear(), fechaDefecto.getMonth() + i, 1)
+      const mesesManuales = []
+      const fechaBase = new Date()
+      fechaBase.setMonth(fechaBase.getMonth() - 6)
+      
+      for (let i = 0; i < 7; i++) {
+        const fecha = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + i, 1)
         const nombreMes = fecha.toLocaleDateString('es-ES', { 
           year: 'numeric', 
           month: 'long' 
         })
-        mesesForzados.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+        mesesManuales.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
       }
-      console.log('🔍 Meses forzados:', mesesForzados)
-      return mesesForzados.reverse()
+      
+      console.log('🔍 Meses manuales creados:', mesesManuales)
+      return mesesManuales.reverse()
     }
     
     return meses.reverse() // Mes más reciente primero
