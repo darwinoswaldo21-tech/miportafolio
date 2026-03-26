@@ -138,13 +138,16 @@ export default function CrearFondoPage() {
         body: JSON.stringify(fondoData)
       })
 
-      const result = await response.json()
-      console.log('📡 Respuesta del servidor:', result)
+      console.log('📡 Respuesta HTTP:', response.status, response.statusText)
 
       if (!response.ok) {
-        throw new Error(result.error || 'Error al guardar el fondo')
+        const errorData = await response.json()
+        console.error('❌ Error del servidor:', errorData)
+        throw new Error(errorData.details || errorData.error || 'Error al guardar el fondo')
       }
 
+      const result = await response.json()
+      console.log('📡 Respuesta del servidor:', result)
       console.log('✅ Fondo guardado exitosamente:', result)
       alert('¡Fondo de inversión creado exitosamente!')
       window.location.href = '/fondos'
