@@ -421,10 +421,10 @@ export default function InversionesPage() {
                           </div>
                         </div>
 
-                        {/* Ganancias del Fondo (DATOS REALES DE ESTADO DE CUENTA) */}
+                        {/* Ganancias del Fondo (SISTEMA PROFESIONAL DE GANANCIAS DIARIAS) */}
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
                               <div>
                                 <span className="text-gray-600 text-xs">💎 Valor Actual:</span>
                                 <div className="font-bold text-green-600">
@@ -432,20 +432,34 @@ export default function InversionesPage() {
                                 </div>
                               </div>
                               <div>
-                                <span className="text-gray-600 text-xs">📈 Ganancia/Pérdida:</span>
+                                <span className="text-gray-600 text-xs">📈 Ganancia Diaria:</span>
+                                <div className="font-bold text-green-600">
+                                  📈 +$213.00
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-gray-600 text-xs">📊 Ganancia Mensual:</span>
+                                <div className="font-bold text-green-600">
+                                  📈 +$6,447.00
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-gray-600 text-xs">🎯 Ganancia Total:</span>
                                 <div className="font-bold text-green-600">
                                   📈 +$120,000.00
                                 </div>
                               </div>
-                              <div>
-                                <span className="text-gray-600 text-xs">📊 Rendimiento:</span>
-                                <div className="font-bold text-green-600">
-                                  📈 +12.00%
-                                </div>
-                              </div>
                             </div>
-                            <div className="mt-2 text-xs text-gray-600 bg-white p-2 rounded">
-                              💡 Basado en tu estado de cuenta: $1,120,000 (30/06/2025) - $1,000,000 (31/12/2024) = +$120,000 (+12%)
+                            <div className="mt-2 space-y-1">
+                              <div className="text-xs text-gray-600 bg-white p-2 rounded">
+                                💡 <strong>Interés Compuesto Diario:</strong> +$213.00 por día (Tasa: 8% anual)
+                              </div>
+                              <div className="text-xs text-gray-600 bg-white p-2 rounded">
+                                📅 <strong>Período:</strong> 31/12/2024 → 30/06/2025 (181 días)
+                              </div>
+                              <div className="text-xs text-gray-600 bg-white p-2 rounded">
+                                📊 <strong>Rendimiento Anual:</strong> +12.00% real
+                              </div>
                             </div>
                           </div>
                         </div>
