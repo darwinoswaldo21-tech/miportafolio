@@ -9,6 +9,7 @@ import { DashboardStats, Entidad, Fiduciaria } from '@/app/types'
 import { PlazoFijoCard } from '@/app/components/investment/PlazoFijoCard'
 import { AhorroProgramadoCard } from '@/app/components/investment/AhorroProgramadoCard'
 import { FondosInversionCard } from '@/app/components/investment/FondosInversionCard'
+import { CrearFondoCard } from '@/app/components/investment/CrearFondoCard'
 import { MisInversionesCard } from '@/app/components/investment/MisInversionesCard'
 import { CalculadoraCard } from '@/app/components/investment/CalculadoraCard'
 import { BoletinesCard } from '@/app/components/investment/BoletinesCard'
@@ -99,14 +100,14 @@ export function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
           <PlazoFijoCard onCreatePlazoFijo={handleCreatePlazoFijo} />
           <AhorroProgramadoCard onCreateAhorro={handleCreateAhorro} />
-          <FondosInversionCard onVerFondos={handleVerFondos} />
+          <CrearFondoCard />
           <CalculadoraCard onAbrirCalculadora={handleAbrirCalculadora} />
         </div>
 
         {/* Tools Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+          <FondosInversionCard onVerFondos={handleVerFondos} />
           <BoletinesCard onGestionarBoletines={handleGestionarBoletines} />
-          <AnalisisIACard onAnalizarCooperativa={handleAnalizarCooperativa} />
         </div>
 
         {/* Stats Section */}

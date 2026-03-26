@@ -38,21 +38,8 @@ export default function CrearFondoPage() {
   })
 
   const [errores, setErrores] = useState<Record<string, string>>({})
-
-  // Lista de administradoras (fiduciarias)
-  const administradoras = [
-    'Banco Pichincha',
-    'Banco Guayaquil', 
-    'Cooperativa Juventud Ecuatoriana',
-    'Banco del Pacífico',
-    'Banco Internacional',
-    'Produbanco',
-    'Biess',
-    'IESS',
-    'Banco Amazonas',
-    'Banco Bolivariano',
-    'Otra'
-  ]
+  const [fiduciarias, setFiduciarias] = useState<Array<{id: string, nombre: string, razon_social: string}>>([])
+  const [loadingFiduciarias, setLoadingFiduciarias] = useState(true)
 
   const validarPaso = (paso: number): boolean => {
     const nuevosErrores: Record<string, string> = {}
@@ -109,6 +96,24 @@ export default function CrearFondoPage() {
   useEffect(() => {
     calcularFechaVencimiento()
   }, [formData.fecha_inicio, formData.plazo_dias])
+
+  useEffect(() => {
+    const cargarFiduciarias = async () => {
+      try {
+        const response = await fetch('/api/fiduciarias')
+        if (response.ok) {
+          const data = await response.json()
+          setFiduciarias(data.data || [])
+        }
+      } catch (error) {
+        console.error('Error cargando fiduciarias:', error)
+      } finally {
+        setLoadingFiduciarias(false)
+      }
+    }
+
+    cargarFiduciarias()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -172,16 +177,25 @@ export default function CrearFondoPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Gestora / Administradora <span className="text-red-500">*</span>
               </label>
-              <select
-                value={formData.administradora}
-                onChange={(e) => setFormData({...formData, administradora: e.target.value})}
-                className={`w-full p-2 border rounded-md ${errores.administradora ? 'border-red-500' : 'border-gray-300'}`}
-              >
-                <option value="">Seleccione una fiduciaria...</option>
-                {administradoras.map(admin => (
-                  <option key={admin} value={admin}>{admin}</option>
-                ))}
-              </select>
+              {loadingFiduciarias ? (
+                <div className="w-full p-2 border rounded-md border-gray-300 text-gray-500">
+                  Cargando fiduciarias...
+                </div>
+              ) : (
+                <select
+                  value={formData.administradora}
+                  onChange={(e) => setFormData({...formData, administradora: e.target.value})}
+                  className={`w-full p-2 border rounded-md ${errores.administradora ? 'border-red-500' : 'border-gray-300'}`}
+                >
+                  <option value="">Seleccione una fiduciaria...</option>
+                  {fiduciarias.map(fiduciaria => (
+                    <option key={fiduciaria.id} value={fiduciaria.nombre}>
+                      {fiduciaria.nombre} {fiduciaria.razon_social && `(${fiduciaria.razon_social})`}
+                    </option>
+                  ))}
+                  <option value="Otra">Otra (no registrada)</option>
+                </select>
+              )}
               {errores.administradora && <p className="text-red-500 text-xs mt-1">{errores.administradora}</p>}
             </div>
           </div>
