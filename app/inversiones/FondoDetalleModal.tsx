@@ -83,47 +83,50 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
 
   // Generar lista de meses desde el mes de inicio hasta el mes ACTUAL (todos)
   const generarMeses = () => {
-    console.log('🔍 Iniciando generarMeses()')
-    console.log('🔍 fondo.creado_en:', fondo.creado_en)
-    console.log('🔍 typeof fondo.creado_en:', typeof fondo.creado_en)
+    console.log('🔍 INICIANDO GENERADOR CORREGIDO')
     
     const meses = []
     
-    // FORZAR: Siempre usar junio 2025 como fecha de inicio
-    const fechaInicio = new Date('2025-06-01')
-    console.log('🔍 Fecha forzada de inicio (junio 2025):', fechaInicio)
-    console.log('🔍 Mes de inicio forzado:', fechaInicio.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }))
+    // FORZAR EXACTO: Junio 2025 como fecha de inicio
+    const fechaInicio = new Date(2025, 5, 1) // Mes 5 = Junio (0-11)
+    console.log('🔍 FORZANDO fechaInicio exacta:', fechaInicio)
+    console.log('🔍 Mes inicio:', fechaInicio.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }))
     
     const fechaActual = new Date()
     console.log('🔍 fechaActual:', fechaActual)
     
-    // Empezar desde junio 2025
-    let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
-    console.log('🔍 currentDate inicial:', currentDate)
+    // Generar meses MANUALMENTE para evitar errores
+    const fechaActualAux = new Date()
+    const mesActualNum = fechaActualAux.getMonth()
+    const añoActualNum = fechaActualAux.getFullYear()
     
-    // Generar meses hacia adelante hasta el mes ACTUAL (todos los meses)
-    let contador = 0
-    while (currentDate <= fechaActual && contador < 24) { // Máximo 24 meses
-      const nombreMes = currentDate.toLocaleDateString('es-ES', { 
+    console.log('🔍 Mes actual:', mesActualNum, 'Año actual:', añoActualNum)
+    
+    // Generar desde junio 2025 hasta marzo 2026
+    let año = 2025
+    let mes = 5 // Junio (0-11)
+    
+    while ((año < añoActualNum) || (año === añoActualNum && mes <= mesActualNum)) {
+      const fecha = new Date(año, mes, 1)
+      const nombreMes = fecha.toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long' 
       })
       const mesFormateado = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)
+      
+      console.log('🔍 AÑADIENDO MES CORRECTO:', mesFormateado)
       meses.unshift(mesFormateado)
-      console.log('🔍 Añadiendo mes:', mesFormateado, '- currentDate:', currentDate)
       
-      // AVANZAR al siguiente mes CORRECTAMENTE
-      const nextMonth = new Date(currentDate)
-      nextMonth.setMonth(nextMonth.getMonth() + 1)
-      currentDate = nextMonth
-      
-      contador++
+      // Siguiente mes
+      mes++
+      if (mes > 11) {
+        mes = 0
+        año++
+      }
     }
     
-    console.log('🔍 Meses generados:', meses)
-    console.log('🔍 Total meses:', meses.length)
-    console.log('🔍 Primer mes (más antiguo):', meses[meses.length - 1])
-    console.log('🔍 Último mes (más reciente):', meses[0])
+    console.log('🔍 MESES FINALES:', meses)
+    console.log('🔍 TOTAL MESES:', meses.length)
     
     return meses.reverse() // Mes más reciente primero
   }
