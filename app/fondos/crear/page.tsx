@@ -223,6 +223,7 @@ export default function CrearFondoPage() {
                       </div>
                     </div>
                   </div>
+                </div>
 
                 {/* Columna 2: Detalles Financieros */}
                 <div className="space-y-4">
