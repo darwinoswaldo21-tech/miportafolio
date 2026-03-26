@@ -62,10 +62,12 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   const getFechaInicioFormateada = () => {
     // FORZAR: Siempre usar junio 2025 para este fondo específico
     const fechaForzada = new Date('2025-06-01')
-    return fechaForzada.toLocaleDateString('es-ES', { 
+    const resultado = fechaForzada.toLocaleDateString('es-ES', { 
       year: 'numeric', 
       month: 'long' 
     })
+    console.log('🔍 getFechaInicioFormateada() - FORZANDO junio 2025:', resultado)
+    return resultado
   }
 
   const [datosMensuales, setDatosMensuales] = useState<DatosMensualesFondo>({
@@ -90,6 +92,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     // FORZAR: Siempre usar junio 2025 como fecha de inicio
     const fechaInicio = new Date('2025-06-01')
     console.log('🔍 Fecha forzada de inicio (junio 2025):', fechaInicio)
+    console.log('🔍 Mes de inicio forzado:', fechaInicio.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }))
     
     const fechaActual = new Date()
     console.log('🔍 fechaActual:', fechaActual)
@@ -114,6 +117,8 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     
     console.log('🔍 Meses generados:', meses)
     console.log('🔍 Total meses:', meses.length)
+    console.log('🔍 Primer mes (más antiguo):', meses[meses.length - 1])
+    console.log('🔍 Último mes (más reciente):', meses[0])
     
     return meses.reverse() // Mes más reciente primero
   }
