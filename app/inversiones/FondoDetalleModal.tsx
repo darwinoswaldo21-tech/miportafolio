@@ -209,7 +209,15 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
 
   // Subir imagen permanentemente a Supabase
   const subirImagenPermanente = async () => {
-    if (!imagenSubida) return
+    if (!imagenSubida) {
+      console.log('❌ No hay imagen seleccionada')
+      return
+    }
+    
+    console.log('🚀 Iniciando subida desde frontend...')
+    console.log('- imagenSubida:', imagenSubida?.name)
+    console.log('- fondo_id:', fondo.id)
+    console.log('- mes:', mesSeleccionado)
     
     setProcesando(true)
     try {
@@ -223,13 +231,21 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
         formData.append('datos_extraidos', JSON.stringify(datosIa))
       }
       
+      console.log('📤 Enviando fetch a /api/subir-imagen-fondo...')
       const response = await fetch('/api/subir-imagen-fondo', {
         method: 'POST',
         body: formData
       })
       
+      console.log('📊 Respuesta recibida:')
+      console.log('- status:', response.status)
+      console.log('- ok:', response.ok)
+      console.log('- statusText:', response.statusText)
+      
       if (response.ok) {
         const resultado = await response.json()
+        console.log('📊 Resultado JSON:', resultado)
+        
         if (resultado.success) {
           console.log('✅ Imagen guardada permanentemente:', resultado.datos.url_publica)
           
@@ -240,13 +256,17 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
           setImagenSubida(null)
           setDatosIa(null)
         } else {
+          console.log('❌ Error en respuesta:', resultado.error)
           alert(`❌ Error guardando imagen: ${resultado.error}`)
         }
       } else {
+        console.log('❌ Error HTTP:', response.status, response.statusText)
         alert('❌ Error en la respuesta del servidor')
       }
     } catch (error) {
-      console.error('Error subiendo imagen:', error)
+      console.error('❌ Error en frontend:', error)
+      console.error('Tipo:', error instanceof Error ? error.constructor.name : 'Desconocido')
+      console.error('Mensaje:', error instanceof Error ? error.message : 'Error desconocido')
       alert('❌ Error subiendo imagen. Intente nuevamente.')
     } finally {
       setProcesando(false)
