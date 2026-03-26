@@ -62,9 +62,8 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
         })
       }
     }
-    // Si no hay fecha válida, usar fecha por defecto (hace 6 meses)
-    const fechaDefecto = new Date()
-    fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
+    // Si no hay fecha válida, usar junio 2025 (fecha real del fondo)
+    const fechaDefecto = new Date('2025-06-01')
     return fechaDefecto.toLocaleDateString('es-ES', { 
       year: 'numeric', 
       month: 'long' 
@@ -90,18 +89,32 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     
     const meses = []
     
-    // FORZAR EXTREMO: Siempre usar una fecha de inicio fija para garantizar meses
-    // Usar una fecha de hace 6 meses para asegurar múltiples meses disponibles
-    const fechaForzada = new Date()
-    fechaForzada.setMonth(fechaForzada.getMonth() - 6)
-    const fechaInicio = fechaForzada
+    // USAR LA FECHA REAL DEL FONDO
+    let fechaInicio: Date
     
-    console.log('🔍 Fecha forzada de inicio:', fechaInicio)
+    // Intentar usar la fecha real del fondo
+    if (fondo.creado_en && fondo.creado_en !== null && fondo.creado_en !== undefined) {
+      fechaInicio = new Date(fondo.creado_en)
+      console.log('🔍 fechaInicio desde creado_en:', fechaInicio)
+      console.log('🔍 isNaN(fechaInicio.getTime()):', isNaN(fechaInicio.getTime()))
+      
+      // Si la fecha es inválida, usar una fecha por defecto (junio 2025 para este fondo)
+      if (isNaN(fechaInicio.getTime())) {
+        const fechaDefecto = new Date('2025-06-01') // Forzar junio 2025
+        fechaInicio = fechaDefecto
+        console.log('⚠️ Fecha de creación inválida, usando junio 2025:', fechaInicio)
+      }
+    } else {
+      // Si no hay fecha, usar junio 2025 (fecha real del fondo)
+      const fechaDefecto = new Date('2025-06-01')
+      fechaInicio = fechaDefecto
+      console.log('⚠️ No hay fecha de creación, usando junio 2025:', fechaInicio)
+    }
     
     const fechaActual = new Date()
     console.log('🔍 fechaActual:', fechaActual)
     
-    // Empezar desde el mes exacto de inicio forzado
+    // Empezar desde el mes exacto de inicio del fondo
     let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
     console.log('🔍 currentDate inicial:', currentDate)
     
@@ -122,13 +135,12 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     console.log('🔍 Meses generados:', meses)
     console.log('🔍 Total meses:', meses.length)
     
-    // FORZAR: Si por alguna razón no hay meses, crear manualmente
+    // FORZAR: Si por alguna razón no hay meses, crear manualmente desde junio 2025
     if (meses.length === 0) {
       const mesesManuales = []
-      const fechaBase = new Date()
-      fechaBase.setMonth(fechaBase.getMonth() - 6)
+      const fechaBase = new Date('2025-06-01') // Forzar junio 2025
       
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 10; i++) {
         const fecha = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + i, 1)
         const nombreMes = fecha.toLocaleDateString('es-ES', { 
           year: 'numeric', 
@@ -137,7 +149,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
         mesesManuales.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
       }
       
-      console.log('🔍 Meses manuales creados:', mesesManuales)
+      console.log('🔍 Meses manuales creados desde junio 2025:', mesesManuales)
       return mesesManuales.reverse()
     }
     
