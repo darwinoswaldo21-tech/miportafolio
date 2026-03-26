@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
     // Cargar todas las fiduciarias
     const { data, error } = await supabase
       .from('fiduciarias')
-      .select('*')
-      .order('nombre', { ascending: true })
+      .select('id, ruc, razon_social, sector, sistema, representante_legal, domicilio, telefono, email')
+      .order('razon_social', { ascending: true })
 
     console.log('📊 Datos de fiduciarias:', { 
       count: data?.length || 0, 

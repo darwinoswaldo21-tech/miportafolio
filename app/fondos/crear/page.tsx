@@ -38,7 +38,7 @@ export default function CrearFondoPage() {
   })
 
   const [errores, setErrores] = useState<Record<string, string>>({})
-  const [fiduciarias, setFiduciarias] = useState<Array<{id: string, nombre: string, razon_social: string}>>([])
+  const [fiduciarias, setFiduciarias] = useState<Array<{id: string, razon_social: string}>>([])
   const [loadingFiduciarias, setLoadingFiduciarias] = useState(true)
 
   const validarPaso = (paso: number): boolean => {
@@ -120,60 +120,60 @@ export default function CrearFondoPage() {
           console.error('❌ Error en respuesta de API:', data.error)
           // Agregar fiduciarias reales por defecto si falla la API
           setFiduciarias([
-            { id: '1', nombre: 'ADMINISTRADORA DE FONDOS ADMUNIFONDOS S.A.', razon_social: 'ADMINISTRADORA DE FONDOS ADMUNIFONDOS S.A. (ADMIN. MUNICIPAL DE FONDOS Y FIDEICOMISOS SOC. ANONIMA)' },
-            { id: '2', nombre: 'ADMINISTRADORA DE FONDOS DYNAMO S.A.', razon_social: 'ADMINISTRADORA DE FONDOS DYNAMO S.A.' },
-            { id: '3', nombre: 'FIDUVAL S.A.', razon_social: 'FIDUVAL S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '4', nombre: 'TRUST FIDUCIARIA S.A.', razon_social: 'TRUST FIDUCIARIA S.A.' },
-            { id: '5', nombre: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.' },
-            { id: '8', nombre: 'AFPV ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.', razon_social: 'AFPV ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-            { id: '9', nombre: 'ANALYTICAFUNDS MANAGEMENT C.A.', razon_social: 'ANALYTICAFUNDS MANAGEMENT C.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '10', nombre: 'ANEFI S.A.', razon_social: 'ANEFI S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '11', nombre: 'ARAFISA S.A.', razon_social: 'ARAFISA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '12', nombre: 'BANCO CENTRAL DEL ECUADOR', razon_social: 'BANCO CENTRAL DEL ECUADOR' },
-            { id: '13', nombre: 'CAPITALIUM ADMINISTRADORA DE FONDOS S.A.', razon_social: 'CAPITALIUM ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-            { id: '14', nombre: 'CORPORACION FINANCIERA NACIONAL BP', razon_social: 'CORPORACION FINANCIERA NACIONAL BP' },
-            { id: '15', nombre: 'CORPORACION NACIONAL DE FINANZAS POPULARES', razon_social: 'CORPORACION NACIONAL DE FINANZAS POPULARES Y SOLIDARIAS' },
-            { id: '16', nombre: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '17', nombre: 'FIDES TRUST S.A.', razon_social: 'FIDES TRUST, ADMINISTRADORA DE NEGOCIOS FIDUCIARIOS FITRUST S.A.' },
-            { id: '18', nombre: 'FIDUCIA S.A.', razon_social: 'FIDUCIA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS MERCANTILES' },
-            { id: '19', nombre: 'FIDUCIARIA ATLÁNTIDA FIDUTLAN S.A.', razon_social: 'FIDUCIARIA ATLÁNTIDA FIDUTLAN ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-            { id: '20', nombre: 'FIDUCIARIA DEL PACIFICO S.A.', razon_social: 'FIDUCIARIA DEL PACIFICO S.A. FIDUPACIFICO' },
-            { id: '21', nombre: 'FIDUCIARIA ECUADOR FIDUECUADOR S.A.', razon_social: 'FIDUCIARIA ECUADOR FIDUECUADOR S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '22', nombre: 'FIDUNEGOCIOS S.A.', razon_social: 'FIDUNEGOCIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '23', nombre: 'GENERATRUST ADMINISTRADORA DE FONDOS S.A.', razon_social: 'GENERATRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-            { id: '24', nombre: 'HEIMDALTRUST ADMINISTRADORA DE FONDOS S.A.', razon_social: 'HEIMDALTRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-            { id: '25', nombre: 'LATINTRUST S.A.', razon_social: 'LATINTRUST S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-            { id: '46', nombre: 'PLUS FONDOS S.A.', razon_social: 'PLUS FONDOS S.A.' }
+            { id: '1', razon_social: 'ADMINISTRADORA DE FONDOS ADMUNIFONDOS S.A. (ADMIN. MUNICIPAL DE FONDOS Y FIDEICOMISOS SOC. ANONIMA)' },
+            { id: '2', razon_social: 'ADMINISTRADORA DE FONDOS DYNAMO S.A.' },
+            { id: '3', razon_social: 'FIDUVAL S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '4', razon_social: 'TRUST FIDUCIARIA S.A.' },
+            { id: '5', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.' },
+            { id: '8', razon_social: 'AFPV ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+            { id: '9', razon_social: 'ANALYTICAFUNDS MANAGEMENT C.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '10', razon_social: 'ANEFI S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '11', razon_social: 'ARAFISA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '12', razon_social: 'BANCO CENTRAL DEL ECUADOR' },
+            { id: '13', razon_social: 'CAPITALIUM ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+            { id: '14', razon_social: 'CORPORACION FINANCIERA NACIONAL BP' },
+            { id: '15', razon_social: 'CORPORACION NACIONAL DE FINANZAS POPULARES Y SOLIDARIAS' },
+            { id: '16', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '17', razon_social: 'FIDES TRUST, ADMINISTRADORA DE NEGOCIOS FIDUCIARIOS FITRUST S.A.' },
+            { id: '18', razon_social: 'FIDUCIA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS MERCANTILES' },
+            { id: '19', razon_social: 'FIDUCIARIA ATLÁNTIDA FIDUTLAN ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+            { id: '20', razon_social: 'FIDUCIARIA DEL PACIFICO S.A. FIDUPACIFICO' },
+            { id: '21', razon_social: 'FIDUCIARIA ECUADOR FIDUECUADOR S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '22', razon_social: 'FIDUNEGOCIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '23', razon_social: 'GENERATRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+            { id: '24', razon_social: 'HEIMDALTRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+            { id: '25', razon_social: 'LATINTRUST S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+            { id: '46', razon_social: 'PLUS FONDOS S.A.' }
           ])
         }
       } catch (error) {
         console.error('❌ Error cargando fiduciarias en formulario:', error)
         // Agregar fiduciarias reales por defecto si hay error de red
         setFiduciarias([
-          { id: '1', nombre: 'ADMINISTRADORA DE FONDOS ADMUNIFONDOS S.A.', razon_social: 'ADMINISTRADORA DE FONDOS ADMUNIFONDOS S.A. (ADMIN. MUNICIPAL DE FONDOS Y FIDEICOMISOS SOC. ANONIMA)' },
-          { id: '2', nombre: 'ADMINISTRADORA DE FONDOS DYNAMO S.A.', razon_social: 'ADMINISTRADORA DE FONDOS DYNAMO S.A.' },
-          { id: '3', nombre: 'FIDUVAL S.A.', razon_social: 'FIDUVAL S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '4', nombre: 'TRUST FIDUCIARIA S.A.', razon_social: 'TRUST FIDUCIARIA S.A.' },
-          { id: '5', nombre: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.' },
-          { id: '8', nombre: 'AFPV ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.', razon_social: 'AFPV ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-          { id: '9', nombre: 'ANALYTICAFUNDS MANAGEMENT C.A.', razon_social: 'ANALYTICAFUNDS MANAGEMENT C.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '10', nombre: 'ANEFI S.A.', razon_social: 'ANEFI S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '11', nombre: 'ARAFISA S.A.', razon_social: 'ARAFISA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '12', nombre: 'BANCO CENTRAL DEL ECUADOR', razon_social: 'BANCO CENTRAL DEL ECUADOR' },
-          { id: '13', nombre: 'CAPITALIUM ADMINISTRADORA DE FONDOS S.A.', razon_social: 'CAPITALIUM ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-          { id: '14', nombre: 'CORPORACION FINANCIERA NACIONAL BP', razon_social: 'CORPORACION FINANCIERA NACIONAL BP' },
-          { id: '15', nombre: 'CORPORACION NACIONAL DE FINANZAS POPULARES', razon_social: 'CORPORACION NACIONAL DE FINANZAS POPULARES Y SOLIDARIAS' },
-          { id: '16', nombre: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '17', nombre: 'FIDES TRUST S.A.', razon_social: 'FIDES TRUST, ADMINISTRADORA DE NEGOCIOS FIDUCIARIOS FITRUST S.A.' },
-          { id: '18', nombre: 'FIDUCIA S.A.', razon_social: 'FIDUCIA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS MERCANTILES' },
-          { id: '19', nombre: 'FIDUCIARIA ATLÁNTIDA FIDUTLAN S.A.', razon_social: 'FIDUCIARIA ATLÁNTIDA FIDUTLAN ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-          { id: '20', nombre: 'FIDUCIARIA DEL PACIFICO S.A.', razon_social: 'FIDUCIARIA DEL PACIFICO S.A. FIDUPACIFICO' },
-          { id: '21', nombre: 'FIDUCIARIA ECUADOR FIDUECUADOR S.A.', razon_social: 'FIDUCIARIA ECUADOR FIDUECUADOR S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '22', nombre: 'FIDUNEGOCIOS S.A.', razon_social: 'FIDUNEGOCIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '23', nombre: 'GENERATRUST ADMINISTRADORA DE FONDOS S.A.', razon_social: 'GENERATRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-          { id: '24', nombre: 'HEIMDALTRUST ADMINISTRADORA DE FONDOS S.A.', razon_social: 'HEIMDALTRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
-          { id: '25', nombre: 'LATINTRUST S.A.', razon_social: 'LATINTRUST S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
-          { id: '46', nombre: 'PLUS FONDOS S.A.', razon_social: 'PLUS FONDOS S.A.' }
+          { id: '1', razon_social: 'ADMINISTRADORA DE FONDOS ADMUNIFONDOS S.A. (ADMIN. MUNICIPAL DE FONDOS Y FIDEICOMISOS SOC. ANONIMA)' },
+          { id: '2', razon_social: 'ADMINISTRADORA DE FONDOS DYNAMO S.A.' },
+          { id: '3', razon_social: 'FIDUVAL S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '4', razon_social: 'TRUST FIDUCIARIA S.A.' },
+          { id: '5', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A.' },
+          { id: '8', razon_social: 'AFPV ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+          { id: '9', razon_social: 'ANALYTICAFUNDS MANAGEMENT C.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '10', razon_social: 'ANEFI S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '11', razon_social: 'ARAFISA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '12', razon_social: 'BANCO CENTRAL DEL ECUADOR' },
+          { id: '13', razon_social: 'CAPITALIUM ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+          { id: '14', razon_social: 'CORPORACION FINANCIERA NACIONAL BP' },
+          { id: '15', razon_social: 'CORPORACION NACIONAL DE FINANZAS POPULARES Y SOLIDARIAS' },
+          { id: '16', razon_social: 'ENLACE NEGOCIOS FIDUCIARIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '17', razon_social: 'FIDES TRUST, ADMINISTRADORA DE NEGOCIOS FIDUCIARIOS FITRUST S.A.' },
+          { id: '18', razon_social: 'FIDUCIA S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS MERCANTILES' },
+          { id: '19', razon_social: 'FIDUCIARIA ATLÁNTIDA FIDUTLAN ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+          { id: '20', razon_social: 'FIDUCIARIA DEL PACIFICO S.A. FIDUPACIFICO' },
+          { id: '21', razon_social: 'FIDUCIARIA ECUADOR FIDUECUADOR S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '22', razon_social: 'FIDUNEGOCIOS S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '23', razon_social: 'GENERATRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+          { id: '24', razon_social: 'HEIMDALTRUST ADMINISTRADORA DE FONDOS Y FIDEICOMISOS S.A.' },
+          { id: '25', razon_social: 'LATINTRUST S.A. ADMINISTRADORA DE FONDOS Y FIDEICOMISOS' },
+          { id: '46', razon_social: 'PLUS FONDOS S.A.' }
         ])
       } finally {
         setLoadingFiduciarias(false)
@@ -257,8 +257,8 @@ export default function CrearFondoPage() {
                 >
                   <option value="">Seleccione una fiduciaria...</option>
                   {fiduciarias.map(fiduciaria => (
-                    <option key={fiduciaria.id} value={fiduciaria.nombre}>
-                      {fiduciaria.nombre}
+                    <option key={fiduciaria.id} value={fiduciaria.razon_social}>
+                      {fiduciaria.razon_social}
                     </option>
                   ))}
                   <option value="Otra">Otra (no registrada)</option>
