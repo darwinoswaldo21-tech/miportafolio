@@ -217,6 +217,5 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
         fondo={selectedInversion} 
         onClose={() => setSelectedInversion(null)} 
       />
-    )}
-  )
+    )
 }
