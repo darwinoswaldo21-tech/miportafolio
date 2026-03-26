@@ -247,11 +247,20 @@ export default function FondosPage() {
         )}
 
         {/* Fondos Disponibles */}
-        <Card>
+        <Card className="mb-4">
           <CardHeader>
-            <h2 className="text-lg font-bold">
-              Fondos Disponibles ({fondosFiltrados.length})
-            </h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-bold">
+                Fondos Disponibles ({fondosFiltrados.length})
+              </h2>
+              <Button 
+                variant="primary" 
+                onClick={() => window.location.href = '/fondos/crear'}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                ➕ Crear Fondo Personalizado
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
