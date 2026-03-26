@@ -53,17 +53,20 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     notas: ''
   })
 
-  // Generar lista de meses desde el mes de inicio del fondo hasta el mes actual
+  // Generar lista de meses desde el mes de inicio hasta el mes PASADO (no el actual)
   const generarMeses = () => {
     const meses = []
     const fechaInicio = new Date(fondo.creado_en)
     const fechaActual = new Date()
     
+    // Calcular el mes pasado (el último mes completado)
+    const mesPasado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1)
+    
     // Empezar desde el mes exacto de inicio del fondo
     let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
     
-    // Generar meses hacia adelante hasta el mes actual
-    while (currentDate <= fechaActual) {
+    // Generar meses hacia adelante hasta el mes PASADO (no el actual)
+    while (currentDate <= mesPasado) {
       const nombreMes = currentDate.toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long' 
@@ -72,7 +75,26 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       currentDate.setMonth(currentDate.getMonth() + 1)
     }
     
-    return meses.reverse() // Mes más reciente primero
+    return meses.reverse() // Mes más reciente primero (el pasado)
+  }
+
+  // Obtener información del mes actual
+  const getMesActual = () => {
+    const fechaActual = new Date()
+    return fechaActual.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long' 
+    })
+  }
+
+  // Obtener información del mes pasado
+  const getMesPasado = () => {
+    const fechaActual = new Date()
+    const mesPasado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1)
+    return mesPasado.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long' 
+    })
   }
 
   const mesesDisponibles = generarMeses()
@@ -202,6 +224,43 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
             <div className="border-b pb-4">
               <h4 className="font-semibold text-lg">{fondo.nombre}</h4>
               <p className="text-gray-600">{fondo.gestora_nombre}</p>
+            </div>
+
+            {/* Información del Mes Actual */}
+            <div className="bg-yellow-50 p-4 rounded">
+              <h4 className="font-semibold mb-2">📅 Información del Mes Actual</h4>
+              <div className="text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span className="font-medium">🗓️ Mes Actual:</span>
+                  <span className="text-orange-600 font-bold">{getMesActual()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">📊 Último Mes Completado:</span>
+                  <span className="text-green-600 font-bold">{getMesPasado()}</span>
+                </div>
+                <div className="text-xs text-gray-600 mt-2">
+                  💡 Puedes actualizar datos hasta {getMesPasado()}. {getMesActual()} aún no está completado.
+                </div>
+              </div>
+            </div>
+
+            {/* Opción de Actualizar Todos los Meses */}
+            <div className="bg-purple-50 p-4 rounded">
+              <h4 className="font-semibold mb-2">🔄 Actualización Masiva</h4>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    alert(`🔄 Actualizar todos los meses desde ${fondo.creado_en ? new Date(fondo.creado_en).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : 'el inicio'} hasta ${getMesPasado()}`)
+                  }}
+                  className="w-full"
+                >
+                  🔄 Actualizar Todos los Meses
+                </Button>
+                <div className="text-xs text-gray-600">
+                  💡 Esta opción te permitirá editar datos de todos los meses desde el inicio hasta el último mes completado.
+                </div>
+              </div>
             </div>
 
             {/* Selector de Mes */}
