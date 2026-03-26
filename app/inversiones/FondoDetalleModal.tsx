@@ -75,7 +75,26 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   // Generar lista de meses desde el mes de inicio hasta el mes ACTUAL (todos)
   const generarMeses = () => {
     const meses = []
-    const fechaInicio = new Date(fondo.creado_en)
+    
+    // Validar y obtener fecha de inicio del fondo
+    let fechaInicio: Date
+    if (fondo.creado_en) {
+      fechaInicio = new Date(fondo.creado_en)
+      // Si la fecha es inválida, usar una fecha por defecto (hace 6 meses)
+      if (isNaN(fechaInicio.getTime())) {
+        const fechaDefecto = new Date()
+        fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
+        fechaInicio = fechaDefecto
+        console.log('⚠️ Fecha de creación inválida, usando fecha por defecto:', fechaInicio)
+      }
+    } else {
+      // Si no hay fecha de creación, usar una fecha por defecto (hace 6 meses)
+      const fechaDefecto = new Date()
+      fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
+      fechaInicio = fechaDefecto
+      console.log('⚠️ No hay fecha de creación, usando fecha por defecto:', fechaInicio)
+    }
+    
     const fechaActual = new Date()
     
     // Empezar desde el mes exacto de inicio del fondo
