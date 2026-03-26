@@ -37,7 +37,7 @@ interface FondoDetalleModalProps {
 
 export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
   const [editando, setEditando] = useState(false)
-  const [mesSeleccionado, setMesSeleccionado] = useState(getMesActual()) // Usar el mes actual dinámicamente
+  const [mesSeleccionado, setMesSeleccionado] = useState('Marzo 2026')
   const [imagenSubida, setImagenSubida] = useState<File | null>(null)
   const [procesando, setProcesando] = useState(false)
   const [datosIa, setDatosIa] = useState<Partial<DatosMensualesFondo> | null>(null)
@@ -51,16 +51,26 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     })
   }
 
-  // Obtener información del mes pasado
-  const getMesPasado = () => {
-    const fechaActual = new Date()
-    const mesPasado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1)
-    return mesPasado.toLocaleDateString('es-ES', { 
+  // Obtener fecha de inicio formateada
+  const getFechaInicioFormateada = () => {
+    if (fondo.creado_en) {
+      const fechaInicio = new Date(fondo.creado_en)
+      if (!isNaN(fechaInicio.getTime())) {
+        return fechaInicio.toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long' 
+        })
+      }
+    }
+    // Si no hay fecha válida, usar fecha por defecto (hace 6 meses)
+    const fechaDefecto = new Date()
+    fechaDefecto.setMonth(fechaDefecto.getMonth() - 6)
+    return fechaDefecto.toLocaleDateString('es-ES', { 
       year: 'numeric', 
       month: 'long' 
     })
   }
-  
+
   const [datosMensuales, setDatosMensuales] = useState<DatosMensualesFondo>({
     fondo_id: fondo.id,
     mes: getMesActual(), // Usar el mes actual dinámicamente
@@ -258,7 +268,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                   <span className="text-orange-600 font-bold">{getMesActual()}</span>
                 </div>
                 <div className="text-xs text-gray-600 mt-2">
-                  💡 Puedes actualizar datos de todos los meses desde {fondo.creado_en ? new Date(fondo.creado_en).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : 'el inicio'} hasta {getMesActual()}.
+                  💡 Puedes actualizar datos de todos los meses desde {getFechaInicioFormateada()} hasta {getMesActual()}.
                 </div>
               </div>
             </div>
