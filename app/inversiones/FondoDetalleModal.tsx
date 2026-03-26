@@ -84,12 +84,19 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
 
   // Generar lista de meses desde el mes de inicio hasta el mes ACTUAL (todos)
   const generarMeses = () => {
+    console.log('🔍 Iniciando generarMeses()')
+    console.log('🔍 fondo.creado_en:', fondo.creado_en)
+    console.log('🔍 typeof fondo.creado_en:', typeof fondo.creado_en)
+    
     const meses = []
     
     // Validar y obtener fecha de inicio del fondo
     let fechaInicio: Date
     if (fondo.creado_en) {
       fechaInicio = new Date(fondo.creado_en)
+      console.log('🔍 fechaInicio desde creado_en:', fechaInicio)
+      console.log('🔍 isNaN(fechaInicio.getTime()):', isNaN(fechaInicio.getTime()))
+      
       // Si la fecha es inválida, usar una fecha por defecto (hace 6 meses)
       if (isNaN(fechaInicio.getTime())) {
         const fechaDefecto = new Date()
@@ -106,9 +113,11 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     }
     
     const fechaActual = new Date()
+    console.log('🔍 fechaActual:', fechaActual)
     
     // Empezar desde el mes exacto de inicio del fondo
     let currentDate = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1)
+    console.log('🔍 currentDate inicial:', currentDate)
     
     // Generar meses hacia adelante hasta el mes ACTUAL (todos los meses)
     while (currentDate <= fechaActual) {
@@ -118,8 +127,10 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       })
       meses.unshift(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
       currentDate.setMonth(currentDate.getMonth() + 1)
+      console.log('🔍 Añadiendo mes:', nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
     }
     
+    console.log('🔍 Meses generados:', meses)
     return meses.reverse() // Mes más reciente primero
   }
 
