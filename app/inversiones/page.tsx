@@ -198,7 +198,7 @@ export default function InversionesPage() {
               </div>
               <div className="text-center p-3 bg-purple-50 rounded">
                 <div className="text-2xl font-bold text-purple-600">
-                  {inversiones.length}
+                  {todasLasInversiones.length}
                 </div>
                 <div className="text-sm text-gray-600">Total</div>
               </div>
@@ -210,13 +210,13 @@ export default function InversionesPage() {
         <Card>
           <CardHeader>
             <h2 className="text-lg font-bold">
-              Todas las Inversiones ({inversiones.length})
+              Todas las Inversiones ({todasLasInversiones.length})
             </h2>
           </CardHeader>
           <CardContent>
-            {inversiones.length > 0 ? (
+            {todasLasInversiones.length > 0 ? (
               <div className="space-y-4">
-                {inversiones.map((inversion) => (
+                {todasLasInversiones.map((inversion) => (
                   <div 
                     key={inversion.id} 
                     className="border p-4 rounded-lg hover:bg-gray-50 transition-colors"
@@ -280,7 +280,9 @@ export default function InversionesPage() {
                           </div>
                           <div>
                             <span className="text-gray-500">Periodicidad:</span>
-                            <div className="font-medium">{getPeriodicidadAbreviada(inversion.periodicidad_pago)}</div>
+                            <div className="font-medium">
+                              {getPeriodicidadAbreviada(esFondoInversion(inversion) ? 'Mensual' : inversion.periodicidad_pago)}
+                            </div>
                           </div>
                           <div>
                             <span className="text-gray-500">Inicio:</span>
