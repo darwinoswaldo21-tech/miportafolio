@@ -65,15 +65,17 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     return "Junio de 2025"
   }
 
-  const [datosMensuales, setDatosMensuales] = useState<DatosMensualesFondo>({
-    fondo_id: fondo.id,
-    mes: getMesActual(), // Usar el mes actual dinámicamente
-    unidades_participacion: fondo.unidades || 226.92760352,
-    valor_unidad: fondo.valor_unidad_base || 1.34906548,
-    valor_total_mes: 306.22,
-    tasa_efectiva_mes: fondo.rentabilidad,
-    aporte_mensual: fondo.aporte_mensual,
-    notas: ''
+  const [datosMensuales, setDatosMensuales] = useState<Record<string, DatosMensualesFondo>>({
+    [getMesActual()]: {
+      fondo_id: fondo.id,
+      mes: getMesActual(),
+      unidades_participacion: fondo.unidades || 226.92760352,
+      valor_unidad: fondo.valor_unidad_base || 1.34906548,
+      valor_total_mes: 306.22,
+      tasa_efectiva_mes: fondo.rentabilidad,
+      aporte_mensual: fondo.aporte_mensual,
+      notas: ''
+    }
   })
 
   // Generar lista de meses desde el mes de inicio hasta el mes ACTUAL (todos)
