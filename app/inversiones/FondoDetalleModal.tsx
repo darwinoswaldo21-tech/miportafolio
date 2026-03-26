@@ -224,15 +224,18 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       // SOLUCIÓN CLOUDINARY: Subir directamente a Cloudinary
       console.log('☁️ Importando Cloudinary en frontend...')
       
-      // TEMPORAL: Valores hardcodeados para probar
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'drous3rse'
-      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fondos_preset'
+      // FORZAR: Usar valores hardcodeados directamente
+      const cloudName = 'drous3rse'
+      const uploadPreset = 'fondos_preset'
       
-      console.log('- CLOUDINARY_CLOUD_NAME:', cloudName, '(env:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, ')')
-      console.log('- CLOUDINARY_UPLOAD_PRESET:', uploadPreset, '(env:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET, ')')
+      console.log('- CLOUDINARY_CLOUD_NAME (FORZADO):', cloudName)
+      console.log('- CLOUDINARY_UPLOAD_PRESET (FORZADO):', uploadPreset)
+      console.log('- Variables de entorno originales:')
+      console.log('  - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
+      console.log('  - NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET)
       
       if (!cloudName || !uploadPreset) {
-        throw new Error('Variables de entorno de Cloudinary no configuradas')
+        throw new Error('Variables de Cloudinary no disponibles')
       }
       
       // Convertir imagen a base64
@@ -250,13 +253,16 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       formData.append('file', dataUrl)
       formData.append('upload_preset', uploadPreset)
       
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-          method: 'POST',
-          body: formData
-        }
-      )
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+      console.log('- URL de Cloudinary:', cloudinaryUrl)
+      
+      const response = await fetch(cloudinaryUrl, {
+        method: 'POST',
+        body: formData
+      })
+      
+      console.log('- Respuesta status:', response.status)
+      console.log('- Respuesta ok:', response.ok)
       
       if (!response.ok) {
         const errorText = await response.text()
@@ -265,13 +271,10 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       }
       
       const cloudinaryData = await response.json()
-      console.log(' Imagen subida a Cloudinary:', cloudinaryData)
-      
-      // TEMPORAL: Solo mostrar éxito sin guardar en BD
-      console.log(' Imagen subida exitosamente a Cloudinary (sin BD por RLS)')
+      console.log('✅ Imagen subida a Cloudinary:', cloudinaryData)
       
       // Mostrar mensaje de éxito
-      alert(` Imagen subida exitosamente a CLOUDINARY:\n Archivo: ${imagenSubida.name}\n Tamaño: ${imagenSubida.size} bytes\n Mes: ${mesSeleccionado}\n URL: ${cloudinaryData.secure_url}\n\n Nota: Imagen guardada en Cloudinary. Para guardar en BD, arregla RLS en Supabase.`)
+      alert(`✅ Imagen subida exitosamente a CLOUDINARY:\n📁 Archivo: ${imagenSubida.name}\n📊 Tamaño: ${imagenSubida.size} bytes\n📅 Mes: ${mesSeleccionado}\n☁️ URL: ${cloudinaryData.secure_url}\n\n💡 Nota: Imagen guardada en Cloudinary.`)
       
       // Limpiar formulario
       setImagenSubida(null)
