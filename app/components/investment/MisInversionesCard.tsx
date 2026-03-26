@@ -204,17 +204,19 @@ export function MisInversionesCard({ onVerInversiones }: MisInversionesCardProps
             size="lg"
             onClick={() => window.location.href = '/inversiones'}
             className="px-8 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+          >
+            📋 Ver Todas Mis Inversiones ({inversiones.length})
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
 
-  // Modal de detalles del fondo
-  {selectedInversion && (
-    <FondoDetalleModal 
-      fondo={selectedInversion} 
-      onClose={() => setSelectedInversion(null)} 
-    />
-  )}
+    {/* Modal de detalles del fondo */}
+    {selectedInversion && (
+      <FondoDetalleModal 
+        fondo={selectedInversion} 
+        onClose={() => setSelectedInversion(null)} 
+      />
+    )}
+  )
 }
