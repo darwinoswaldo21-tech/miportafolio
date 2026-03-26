@@ -30,9 +30,12 @@ interface FondoInversion {
   gestora_nombre: string
   valor_liquidativo: number
   rentabilidad: number
+  aporte_mensual: number
   plazo: number
   estado: string
   creado_en: string
+  unidades?: number
+  valor_unidad_base?: number
 }
 
 type TodasLasInversiones = Inversion | FondoInversion
