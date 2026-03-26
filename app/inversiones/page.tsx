@@ -281,6 +281,15 @@ export default function InversionesPage() {
                           </div>
                         </div>
                       </div>
+                      <div className="ml-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedInversion(inversion)}
+                        >
+                          📋 Ver Detalles
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
