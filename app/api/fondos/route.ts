@@ -40,9 +40,9 @@ export async function POST(request: NextRequest) {
       console.log('⚠️ No se encontró la fiduciaria, se usará como texto plano')
     }
 
-    // Preparar datos exactamente como en la tabla
+    // Preparar datos exactamente como en la tabla fondos_inversion
     const fondoData = {
-      user_id: null, // Por ahora null, después se puede actualizar con auth
+      user_id: null, // Por ahora null
       nombre: nombre.trim(),
       gestora_id: gestora_id,
       gestora_nombre: gestora_nombre.trim(),

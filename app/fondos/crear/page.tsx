@@ -150,7 +150,7 @@ export default function CrearFondoPage() {
       console.log('📡 Respuesta del servidor:', result)
       console.log('✅ Fondo guardado exitosamente:', result)
       alert('¡Fondo de inversión creado exitosamente!')
-      window.location.href = '/fondos'
+      window.location.href = '/'
       
     } catch (error) {
       console.error('❌ Error creando fondo:', error)
@@ -171,8 +171,12 @@ export default function CrearFondoPage() {
               <p className="text-sm text-gray-600">Registra y gestiona tus fondos</p>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={() => window.location.href = '/fondos'}>
-                ⬅ Dashboard
+              <Button 
+                variant="secondary" 
+                onClick={() => window.location.href = '/'}
+                className="bg-gray-600 hover:bg-gray-700"
+              >
+                🏠 Volver al Dashboard
               </Button>
               <Button variant="outline" onClick={() => window.location.href = '/login'}>
                 Salir
