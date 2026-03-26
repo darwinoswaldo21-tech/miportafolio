@@ -158,6 +158,56 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     return datosMensuales.unidades_participacion * datosMensuales.valor_unidad
   }
 
+  // Guardar datos en la base de datos
+  const guardarDatosBD = async () => {
+    try {
+      console.log('💾 Guardando datos en BD:', datosMensuales)
+      
+      // Importar cliente de Supabase
+      const { createClient } = require('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+
+      // Preparar datos para guardar
+      const datosAGuardar = {
+        fondo_id: fondo.id,
+        mes: datosMensuales.mes,
+        unidades_participacion: datosMensuales.unidades_participacion,
+        valor_unidad: datosMensuales.valor_unidad,
+        valor_total_mes: calcularValorTotal(),
+        tasa_efectiva_mes: datosMensuales.tasa_efectiva_mes,
+        aporte_mensual: datosMensuales.aporte_mensual,
+        notas: datosMensuales.notas,
+        creado_en: new Date().toISOString()
+      }
+
+      console.log('📊 Datos a guardar:', datosAGuardar)
+
+      // Guardar en la tabla fondo_datos_mensuales
+      const { data, error } = await supabase
+        .from('fondo_datos_mensuales')
+        .upsert(datosAGuardar, {
+          onConflict: 'fondo_id,mes' // Si ya existe, lo actualiza
+        })
+
+      if (error) {
+        console.error('❌ Error al guardar:', error)
+        alert('Error al guardar los datos: ' + error.message)
+        return
+      }
+
+      console.log('✅ Datos guardados exitosamente:', data)
+      alert('✅ Datos guardados exitosamente en la base de datos')
+      setEditando(false)
+      
+    } catch (error) {
+      console.error('❌ Error general:', error)
+      alert('Error al guardar los datos')
+    }
+  }
+
   // Manejar subida de imagen
   const handleImagenSubida = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -555,7 +605,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                     >
                       Cancelar
                     </Button>
-                    <Button>
+                    <Button onClick={guardarDatosBD}>
                       💾 Guardar Datos del Mes
                     </Button>
                   </>
