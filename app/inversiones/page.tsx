@@ -320,7 +320,7 @@ export default function InversionesPage() {
                             {inversion.nombre}
                           </h3>
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            inversion.estado === 'Activa' 
+                            inversion.estado === 'Activo' 
                               ? 'bg-green-100 text-green-800'
                               : inversion.estado === 'Finalizada'
                               ? 'bg-red-100 text-red-800'
@@ -367,6 +367,17 @@ export default function InversionesPage() {
                             </div>
                           </div>
                         </div>
+                      </div>
+                      <div className="ml-4">
+                        {!esFondoInversion(inversion) && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setSelectedInversion(inversion)}
+                          >
+                            📋 Ver Detalles
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
