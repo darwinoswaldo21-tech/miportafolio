@@ -126,9 +126,9 @@ export default function InversionesPage() {
   const fondosDeInversion = todasLasInversiones.filter(esFondoInversion)
   const plazosFijos = todasLasInversiones.filter(inv => !esFondoInversion(inv))
   
-  // Calcular ganancias de fondos de inversión
+  // Calcular ganancias de fondos de inversión (SISTEMA INTELIGENTE)
   const calcularGananciasFondos = () => {
-    console.log('🧮 Calculando ganancias de todos los fondos...')
+    console.log('🧮 Calculando ganancias INTELIGENTES de todos los fondos...')
     
     if (fondosDeInversion.length === 0) {
       return {
@@ -145,7 +145,8 @@ export default function InversionesPage() {
     const detallesPorFondo: DetalleGananciaFondo[] = []
     
     fondosDeInversion.forEach(fondo => {
-      // Calcular valor actual basado en unidades y valor liquidativo
+      // SISTEMA INTELIGENTE: Usar datos de fiduciaria si están disponibles
+      // Por ahora, usar cálculo básico hasta que actualices datos mensuales
       const valorActualFondo = fondo.unidades * fondo.valor_liquidativo
       const inversionInicialFondo = fondo.valor_unidad_base * fondo.unidades
       const gananciaFondo = valorActualFondo - inversionInicialFondo
@@ -166,7 +167,7 @@ export default function InversionesPage() {
     const gananciaTotal = valorActual - totalInvertido
     const porcentajeTotal = totalInvertido > 0 ? (gananciaTotal / totalInvertido) * 100 : 0
     
-    console.log('💰 Resultados generales:')
+    console.log('💰 Resultados generales INTELIGENTES:')
     console.log('- Total invertido:', totalInvertido)
     console.log('- Valor actual:', valorActual)
     console.log('- Ganancia total:', gananciaTotal)

@@ -348,9 +348,9 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     }
   }
 
-  // Calcular ganancias del fondo
+  // Calcular ganancias del fondo (SISTEMA INTELIGENTE)
   const calcularGanancias = () => {
-    console.log('🧮 Calculando ganancias para el fondo:', fondo.nombre)
+    console.log('🧮 Calculando ganancias INTELIGENTES para el fondo:', fondo.nombre)
     
     // Si no hay datos mensuales, retornar null
     if (!datosMensuales || Object.keys(datosMensuales).length === 0) {
@@ -358,40 +358,77 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       return null
     }
     
-    // Obtener todos los meses ordenados
-    const mesesOrdenados = Object.keys(datosMensuales).sort()
-    console.log('📊 Meses disponibles:', mesesOrdenados)
+    // Obtener todos los meses ordenados cronológicamente
+    const mesesOrdenados = Object.keys(datosMensuales).sort((a, b) => {
+      // Ordenar meses cronológicamente
+      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+      const getYearMonth = (mes: string) => {
+        const parts = mes.split(' ')
+        return { year: parseInt(parts[1]), month: meses.indexOf(parts[0]) }
+      }
+      
+      const dateA = getYearMonth(a)
+      const dateB = getYearMonth(b)
+      
+      if (dateA.year !== dateB.year) {
+        return dateA.year - dateB.year
+      }
+      return dateA.month - dateB.month
+    })
+    
+    console.log('📊 Meses ordenados cronológicamente:', mesesOrdenados)
     
     if (mesesOrdenados.length === 0) {
       console.log('❌ No hay meses con datos')
       return null
     }
     
-    // Calcular inversión inicial (primer mes)
-    const primerMes = mesesOrdenados[0]
-    const datosPrimerMes = datosMensuales[primerMes] as DatosMensualesFondo
-    const inversionInicial = datosPrimerMes?.valor_total_mes || 0
+    // SISTEMA INTELIGENTE: Calcular ganancias basadas en datos de fiduciaria
+    let valorTotalActual = 0
+    let valorTotalAnterior = 0
+    let inversionInicial = 0
+    let primerMes = true
     
-    // Calcular valor actual (último mes con datos)
-    const ultimoMes = mesesOrdenados[mesesOrdenados.length - 1]
-    const datosUltimoMes = datosMensuales[ultimoMes] as DatosMensualesFondo
-    const valorActual = datosUltimoMes?.valor_total_mes || 0
+    mesesOrdenados.forEach(mes => {
+      const datosMes = datosMensuales[mes] as DatosMensualesFondo
+      const valorTotalMes = datosMes.valor_total_mes || 0
+      
+      console.log(`📊 Mes: ${mes}, Valor Total: $${valorTotalMes.toLocaleString()}`)
+      
+      if (primerMes) {
+        inversionInicial = valorTotalMes
+        primerMes = false
+      }
+      
+      valorTotalAnterior = valorTotalActual
+      valorTotalActual = valorTotalMes
+    })
     
-    // Calcular ganancia/pérdida
-    const ganancia = valorActual - inversionInicial
-    const porcentaje = inversionInicial > 0 ? (ganancia / inversionInicial) * 100 : 0
+    // Calcular ganancias del mes actual
+    const gananciaMensual = valorTotalActual - valorTotalAnterior
+    const gananciaTotal = valorTotalActual - inversionInicial
     
-    console.log('💰 Resultados:')
+    // Calcular porcentajes
+    const porcentajeMensual = valorTotalAnterior > 0 ? (gananciaMensual / valorTotalAnterior) * 100 : 0
+    const porcentajeTotal = inversionInicial > 0 ? (gananciaTotal / inversionInicial) * 100 : 0
+    
+    console.log('💰 Resultados INTELIGENTES:')
     console.log('- Inversión inicial:', inversionInicial)
-    console.log('- Valor actual:', valorActual)
-    console.log('- Ganancia:', ganancia)
-    console.log('- Porcentaje:', porcentaje)
+    console.log('- Valor total anterior:', valorTotalAnterior)
+    console.log('- Valor total actual:', valorTotalActual)
+    console.log('- Ganancia mensual:', gananciaMensual)
+    console.log('- Ganancia total:', gananciaTotal)
+    console.log('- Porcentaje mensual:', porcentajeMensual)
+    console.log('- Porcentaje total:', porcentajeTotal)
     
     return {
       inversionInicial,
-      valorActual,
-      ganancia,
-      porcentaje
+      valorTotalActual,
+      gananciaMensual,
+      gananciaTotal,
+      porcentajeMensual,
+      porcentajeTotal,
+      valorTotalAnterior
     }
   }
 
@@ -409,7 +446,7 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
 
             {/* Resumen de Ganancias */}
             <div className="bg-green-50 p-4 rounded">
-              <h4 className="font-semibold mb-2">💰 Resumen de Ganancias</h4>
+              <h4 className="font-semibold mb-2">💰 Resumen de Ganancias (Sistema Inteligente)</h4>
               <div className="space-y-2">
                 {calcularGanancias() && (
                   <>
@@ -420,29 +457,43 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-medium">💎 Valor Actual:</span>
+                      <span className="font-medium">💎 Valor Total Actual:</span>
                       <span className="font-bold text-green-600">
-                        ${calcularGanancias()!.valorActual.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${calcularGanancias()!.valorTotalActual.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-medium">📈 Ganancia/Pérdida:</span>
-                      <span className={`font-bold ${calcularGanancias()!.ganancia >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {calcularGanancias()!.ganancia >= 0 ? '📈 +' : '📉 '}
-                        ${Math.abs(calcularGanancias()!.ganancia).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      <span className="font-medium">📈 Ganancia Mensual:</span>
+                      <span className={`font-bold ${calcularGanancias()!.gananciaMensual >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGanancias()!.gananciaMensual >= 0 ? '📈 +' : '📉 '}
+                        ${Math.abs(calcularGanancias()!.gananciaMensual).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-medium">📊 Rendimiento:</span>
-                      <span className={`font-bold ${calcularGanancias()!.porcentaje >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {calcularGanancias()!.porcentaje >= 0 ? '📈 +' : '📉 '}
-                        {Math.abs(calcularGanancias()!.porcentaje).toFixed(2)}%
+                      <span className="font-medium">📊 Rendimiento Mensual:</span>
+                      <span className={`font-bold ${calcularGanancias()!.porcentajeMensual >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGanancias()!.porcentajeMensual >= 0 ? '📈 +' : '📉 '}
+                        {Math.abs(calcularGanancias()!.porcentajeMensual).toFixed(2)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">🎯 Ganancia Total:</span>
+                      <span className={`font-bold ${calcularGanancias()!.gananciaTotal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGanancias()!.gananciaTotal >= 0 ? '📈 +' : '📉 '}
+                        ${Math.abs(calcularGanancias()!.gananciaTotal).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">📊 Rendimiento Total:</span>
+                      <span className={`font-bold ${calcularGanancias()!.porcentajeTotal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {calcularGanancias()!.porcentajeTotal >= 0 ? '📈 +' : '📉 '}
+                        {Math.abs(calcularGanancias()!.porcentajeTotal).toFixed(2)}%
                       </span>
                     </div>
                   </>
                 )}
                 <div className="text-xs text-gray-600 mt-2">
-                  💡 Basado en los datos actualizados de todos los meses.
+                  💡 Basado en datos oficiales de la fiduciaria. Compara mes actual vs mes anterior.
                 </div>
               </div>
             </div>
