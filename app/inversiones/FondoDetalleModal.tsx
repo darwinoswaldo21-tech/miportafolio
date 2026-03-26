@@ -90,8 +90,8 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
     }
   }
 
-  // Procesar imagen con IA
-  const procesarConIa = async () => {
+  // Subir imagen permanentemente a Supabase
+  const subirImagenPermanente = async () => {
     if (!imagenSubida) return
     
     setProcesando(true)
@@ -99,8 +99,14 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       const formData = new FormData()
       formData.append('imagen', imagenSubida)
       formData.append('fondo_id', fondo.id.toString())
+      formData.append('mes', mesSeleccionado)
       
-      const response = await fetch('/api/procesar-imagen-fondo', {
+      // Si hay datos de IA, incluirlos
+      if (datosIa) {
+        formData.append('datos_extraidos', JSON.stringify(datosIa))
+      }
+      
+      const response = await fetch('/api/subir-imagen-fondo', {
         method: 'POST',
         body: formData
       })
@@ -108,16 +114,23 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
       if (response.ok) {
         const resultado = await response.json()
         if (resultado.success) {
-          setDatosIa(resultado.datos)
-          // Actualizar formulario con datos de IA
-          setDatosMensuales({
-            ...datosMensuales,
-            ...resultado.datos
-          })
+          console.log('✅ Imagen guardada permanentemente:', resultado.datos.url_publica)
+          
+          // Mostrar mensaje de éxito
+          alert(`✅ Imagen guardada exitosamente:\n📁 Archivo: ${resultado.datos.nombre_archivo}\n🔗 URL: ${resultado.datos.url_publica}`)
+          
+          // Limpiar formulario
+          setImagenSubida(null)
+          setDatosIa(null)
+        } else {
+          alert(`❌ Error guardando imagen: ${resultado.error}`)
         }
+      } else {
+        alert('❌ Error en la respuesta del servidor')
       }
     } catch (error) {
-      console.error('Error procesando imagen:', error)
+      console.error('Error subiendo imagen:', error)
+      alert('❌ Error subiendo imagen. Intente nuevamente.')
     } finally {
       setProcesando(false)
     }
@@ -176,11 +189,11 @@ export function FondoDetalleModal({ fondo, onClose }: FondoDetalleModalProps) {
                   </div>
                 )}
                 <Button 
-                  onClick={procesarConIa}
+                  onClick={subirImagenPermanente}
                   disabled={!imagenSubida || procesando}
                   className="w-full"
                 >
-                  {procesando ? '🤖 Procesando con IA...' : '🤖 Procesar con IA'}
+                  {procesando ? '📤 Subiendo...' : '📤 Subir Imagen Permanentemente'}
                 </Button>
               </div>
             </div>
